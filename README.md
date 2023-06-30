@@ -1,2 +1,3 @@
 # TIP
-Translational Imaging Pipelines
+*Translational Imaging Pipelines*
+
