@@ -1,0 +1,6 @@
+vtk
+numpy
+pandas
+matplotlib
+opencv-python
+SimpleITK
