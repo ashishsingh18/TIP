@@ -19,6 +19,17 @@ from createcmap import get_continuous_cmap
 #maphemi = pd.read_csv('/Users/vikasbommineni/Desktop/MRIreport/brainvisualize/refs/MUSE_ROI_Dictionary.csv')
 maphemi = pd.read_csv('../refs/MUSE_ROI_Dictionary.csv')
 
+# def write_image(img, output_file_path):
+#     writer = sitk.ImageFileWriter()
+#     writer.SetFileName ( output_file_path )
+#     writer.Execute ( img )
+    
+# def readimage(input_file_path):
+#     reader = sitk.ImageFileReader()
+#     reader.SetFileName ( input_file_path )
+#     image = reader.Execute()
+#     return image
+
 def getbounds(arr):
 	arr = np.mean(arr,axis=2)
 	pos = np.nonzero(arr == 0)
@@ -642,9 +653,14 @@ def _main( roi, allz_num, pdf_path):
 	atrophyvisualization(roi,allz_num,out)
 
 # if __name__ == '__main__':
-# 	roi = '/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/relabel/2.16.840.1.114362.1.12066432.24920037488.604832326.447.nrrd'
+# 	print(656)
+# 	roi = '/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/relabel/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607.nii.gz'
+# 	input = readimage(roi)
+# 	output = write_image(input,'/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/relabel/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607.nrrd')
+# 	print(659)
+# 	roi = '/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/relabel/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607.nrrd'
 # 	with open('/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/roi-quantification/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607_allz_num.pkl','rb') as f:
 # 		allz_num = pickle.load(f)
 
-# 	pdf_path = '/home/diwu/Desktop/TIP/neurodegeneration/processing-containers/brainvisualize/files/test.pdf'
-# 	_main( roi, allz_num, pdf_path)
+	# pdf_path = '/home/diwu/Desktop/TIP/neurodegeneration/processing-containers/brainvisualize/files/test.pdf'
+	# _main( roi, allz_num, pdf_path)
