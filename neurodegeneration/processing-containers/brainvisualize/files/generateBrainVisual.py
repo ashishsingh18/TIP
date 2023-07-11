@@ -15,7 +15,19 @@ from PIL import ImageFont
 
 from createcmap import get_continuous_cmap
 
+#maphemi = pd.read_csv('/Users/vikasbommineni/Desktop/MRIreport/brainvisualize/refs/MUSE_ROI_Dictionary.csv')
 maphemi = pd.read_csv('../refs/MUSE_ROI_Dictionary.csv')
+
+# def write_image(img, output_file_path):
+#     writer = sitk.ImageFileWriter()
+#     writer.SetFileName ( output_file_path )
+#     writer.Execute ( img )
+    
+# def readimage(input_file_path):
+#     reader = sitk.ImageFileReader()
+#     reader.SetFileName ( input_file_path )
+#     image = reader.Execute()
+#     return image
 
 def getbounds(arr):
 	arr = np.mean(arr,axis=2)
@@ -174,6 +186,7 @@ def atrophyvisualization(maskfile, allz, fname):
 	r_filenameSegmentation = fname+'_r.nii.gz'
 	bg_t_filenameSegmentation = fname+'_bg_t.nii.gz'
 	print(174)
+
 	write_image(all_post,all_filenameSegmentation)
 	write_image(l_post,l_filenameSegmentation)
 	write_image(r_post,r_filenameSegmentation)
@@ -587,7 +600,7 @@ def atrophyvisualization(maskfile, allz, fname):
 	img = Image.fromarray(np.uint8(img))
 	img.save(fname+'_finalvis.png')
 
-def _main(roi, allz_num, pdf_path):
+def _main( roi, allz_num, pdf_path):
 	UID = _os.path.basename(pdf_path.removesuffix(".pdf"))
 	out = _os.path.dirname(pdf_path)
 	out = out + '/' + UID
