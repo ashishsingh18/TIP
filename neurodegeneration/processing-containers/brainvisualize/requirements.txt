@@ -2,5 +2,5 @@ vtk
 numpy
 pandas
 matplotlib
-opencv-python
+Pillow==9.3
 SimpleITK
