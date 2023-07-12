@@ -17,11 +17,7 @@ from PIL import ImageFont
 from createcmap import get_continuous_cmap
 
 #maphemi = pd.read_csv('/Users/vikasbommineni/Desktop/MRIreport/brainvisualize/refs/MUSE_ROI_Dictionary.csv')
-<<<<<<< HEAD
 maphemi = pd.read_csv('refs/MUSE_ROI_Dictionary.csv')
-=======
-maphemi = pd.read_csv('../refs/MUSE_ROI_Dictionary.csv')
->>>>>>> df925c407a466218671c1c6355764d35c9ecf289
 
 # def write_image(img, output_file_path):
 #     writer = sitk.ImageFileWriter()
@@ -186,10 +182,8 @@ def atrophyvisualization(maskfile, allz, fname):
 	l_filenameSegmentation = fname+'_l.nii.gz'
 	r_filenameSegmentation = fname+'_r.nii.gz'
 	bg_t_filenameSegmentation = fname+'_bg_t.nii.gz'
-<<<<<<< HEAD
-=======
+	
 	print(174)
->>>>>>> df925c407a466218671c1c6355764d35c9ecf289
 
 	write_image(all_post,all_filenameSegmentation)
 	write_image(l_post,l_filenameSegmentation)
