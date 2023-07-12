@@ -1,12 +1,12 @@
 FROM --platform=linux/amd64 kitware/vtk:ci-el7-mindeps-20230216
-FROM --platform=linux/amd64 python:3.7-slim-buster
+FROM --platform=linux/amd64 python:3.9-slim-buster
 
 LABEL IMAGE="brainvis"
 LABEL VERSION="0.1.0"
 LABEL CI_IGNORE="True"
 
 RUN apt-get update
-RUN apt-get install -y libsm6 libxext6 libxrender-dev libgl1-mesa-dev libglib2.0-0 xvfb
+RUN apt-get install -y libsm6 libxext6 libxrender-dev libgl1-mesa-dev libglib2.0-0
 
 COPY requirements.txt ./
 

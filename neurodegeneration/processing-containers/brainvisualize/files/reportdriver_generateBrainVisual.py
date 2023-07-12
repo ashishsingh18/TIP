@@ -3,7 +3,7 @@ import glob
 import generateBrainVisual
 import pickle
 from datetime import datetime
-import SimpleITK as sitk
+
 # For local testng
 #os.environ["WORKFLOW_DIR"] = "/data"
 #os.environ["BATCH_NAME"] = "batch"
@@ -29,7 +29,6 @@ for batch_element_dir in batch_folders:
     element_output_dir = os.path.join(batch_element_dir, os.environ['OPERATOR_OUT_DIR'])
     if not os.path.exists(element_output_dir):
         os.makedirs(element_output_dir)
-
     
     if len(allz_num) == 0:
         print("No file(s) found!")
