@@ -1,4 +1,6 @@
-vtk
+--extra-index-url https://wheels.vtk.org
+vtk-osmesa
+opencv-python
 numpy
 pandas
 matplotlib
