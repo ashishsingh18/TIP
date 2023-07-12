@@ -69,7 +69,7 @@ for batch_element_dir in batch_folders:
 
     image_input_dir = os.path.join(batch_element_dir, os.environ['OPERATOR_IN_DIR'])
 
-    nrrd_files = sorted(glob.glob(os.path.join(image_input_dir, "*.nrrd*"), recursive=True))
+    nrrd_files = sorted(glob.glob(os.path.join(image_input_dir, "*.nii.gz*"), recursive=True))
 
     script_dir = os.path.dirname(__file__)
     file_path = os.path.join(script_dir, 'MUSE_Kapaana_DerivedRegions_v3.csv')

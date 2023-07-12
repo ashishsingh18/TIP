@@ -1,5 +1,4 @@
 import os as _os
-import cv2
 import pylab as pl
 import numpy as np
 import pandas as pd
@@ -44,10 +43,12 @@ def getbounds(arr):
 
 # Crops each orientation image with 10 pixels boundary
 def crop_and_write(img,orientation,fname,x_dim,y_dim):
+    img = np.asarray(img)
     t,b,l,r = getbounds(img)
 
     img = img[(t-10):(b+10),(l-10):(r+10)]
-    cv2.imwrite(fname+'_' + orientation + '.png',img)
+    img = Image.fromarray(np.uint8(img))
+    img.save(fname+'_' + orientation + '.png')
 
 def vtk_show(orientation, fname, renderer, width=400, height=300):
     """
@@ -73,26 +74,26 @@ def vtk_show(orientation, fname, renderer, width=400, height=300):
     writer.Write()
     
     # Rotate image to allow for good display
-    img=cv2.imread(fname+'_' + orientation + '.png')
+    img=Image.open(fname+'_' + orientation + '.png').convert('RGB')
     
     if orientation == 'axialtop':
-        imgrot = cv2.rotate(img,cv2.ROTATE_90_CLOCKWISE)
+        imgrot = img.rotate(90)
     elif orientation == 'axialbottom':
-        imgrot = cv2.rotate(img,cv2.ROTATE_90_CLOCKWISE)
+        imgrot = img.rotate(90)
     elif orientation == 'lefthemosphere_lateral':
-        imgrot = cv2.rotate(img,cv2.ROTATE_180)
+        imgrot = img.rotate(180)
     elif orientation == 'righthemosphere_lateral':
-        imgrot = cv2.rotate(img,cv2.ROTATE_180)
-    ### Delete associated NRRD file for each of the following screenshot images to clear up space ###
+        imgrot = img.rotate(180)
+    ### Delete associated image file for each of the following screenshot images to clear up space ###
     elif orientation == 'right_medial':
-        _os.remove(fname+'_r.nrrd')
-        imgrot = cv2.rotate(img,cv2.ROTATE_180)
+        _os.remove(fname+'_r.nii.gz')
+        imgrot = img.rotate(180)
     elif orientation == 'left_medial':
-        _os.remove(fname+'_l.nrrd')
-        imgrot = cv2.rotate(img,cv2.ROTATE_180)
+        _os.remove(fname+'_l.nii.gz')
+        imgrot = img.rotate(180)
     elif orientation == 'bg_t_axial':
-        _os.remove(fname+'_bg_t.nrrd')
-        imgrot = cv2.rotate(img,cv2.ROTATE_90_CLOCKWISE)
+        _os.remove(fname+'_bg_t.nii.gz')
+        imgrot = img.rotate(90)
 
     crop_and_write(imgrot,orientation,fname,width,height)
 
@@ -122,8 +123,7 @@ def create_relabel_map(muse_mask,roi_zscore_dict):
     return merge_label_dict
 
 def atrophyvisualization(maskfile, allz, fname):
-	print(f'Entered main code logic')
-	# Path to the .nrrd file
+	# Path to the .nii.gz file
 	filenameSegmentation = maskfile
 	print('114')
 	muse_labelmap=readimage(filenameSegmentation)
@@ -181,15 +181,11 @@ def atrophyvisualization(maskfile, allz, fname):
 	r_post.CopyInformation(muse_labelmap)
 	bg_t_post.CopyInformation(muse_labelmap)
 
-	# all_filenameSegmentation = fname+'_all.nii.gz'
-	# l_filenameSegmentation = fname+'_l.nii.gz'
-	# r_filenameSegmentation = fname+'_r.nii.gz'
-	# bg_t_filenameSegmentation = fname+'_bg_t.nii.gz'
+	all_filenameSegmentation = fname+'_all.nii.gz'
+	l_filenameSegmentation = fname+'_l.nii.gz'
+	r_filenameSegmentation = fname+'_r.nii.gz'
+	bg_t_filenameSegmentation = fname+'_bg_t.nii.gz'
 	print(174)
-	all_filenameSegmentation = fname+'_all.nrrd'
-	l_filenameSegmentation = fname+'_l.nrrd'
-	r_filenameSegmentation = fname+'_r.nrrd'
-	bg_t_filenameSegmentation = fname+'_bg_t.nrrd'
 
 	write_image(all_post,all_filenameSegmentation)
 	write_image(l_post,l_filenameSegmentation)
@@ -198,10 +194,10 @@ def atrophyvisualization(maskfile, allz, fname):
 
 	##################################################
 
-	reader_all = vtk.vtkNrrdReader()
-	reader_l = vtk.vtkNrrdReader()
-	reader_r = vtk.vtkNrrdReader()
-	reader_bg_t = vtk.vtkNrrdReader()
+	reader_all = vtk.vtkNIFTIImageReader()
+	reader_l = vtk.vtkNIFTIImageReader()
+	reader_r = vtk.vtkNIFTIImageReader()
+	reader_bg_t = vtk.vtkNIFTIImageReader()
 
 	reader_all.SetFileName(all_filenameSegmentation)
 	reader_l.SetFileName(l_filenameSegmentation)
@@ -336,17 +332,12 @@ def atrophyvisualization(maskfile, allz, fname):
 	normal = [0,0,0]
 	viewUp = [0,0,0]
 
-	print(f'Entered main code logic')
-
 	# Set orientation logic #
 	for orientation in ['left_medial','bg_t_axial','right_medial','axialtop','axialbottom','lefthemosphere_lateral','righthemosphere_lateral']:
-		print(f'Entered main code logic')
 		if (orientation == 'axialtop') | (orientation == 'axialbottom') | (orientation == 'lefthemosphere_lateral') | (orientation == 'righthemosphere_lateral'):
 			renderer = vtk.vtkRenderer()
 			renderWin = vtk.vtkRenderWindow()
 			renderWin.SetOffScreenRendering(1)
-
-			print(f'Entered main code logic')
 
 			renderWin.AddRenderer(renderer)
 			renderInteractor = vtk.vtkRenderWindowInteractor()
@@ -373,8 +364,6 @@ def atrophyvisualization(maskfile, allz, fname):
 			renderWin = vtk.vtkRenderWindow()
 			renderWin.SetOffScreenRendering(1)
 
-			print(f'Entered main code logic')
-
 			renderWin.AddRenderer(renderer)
 			renderInteractor = vtk.vtkRenderWindowInteractor()
 			renderInteractor.SetRenderWindow(renderWin)
@@ -390,8 +379,6 @@ def atrophyvisualization(maskfile, allz, fname):
 			renderWin = vtk.vtkRenderWindow()
 			renderWin.SetOffScreenRendering(1)
 
-			print(f'Entered main code logic')
-
 			renderWin.AddRenderer(renderer)
 			renderInteractor = vtk.vtkRenderWindowInteractor()
 			renderInteractor.SetRenderWindow(renderWin)
@@ -406,8 +393,6 @@ def atrophyvisualization(maskfile, allz, fname):
 			renderer = vtk.vtkRenderer()
 			renderWin = vtk.vtkRenderWindow()
 			renderWin.SetOffScreenRendering(1)
-
-			print(f'Entered main code logic')
 
 			renderWin.AddRenderer(renderer)
 			renderInteractor = vtk.vtkRenderWindowInteractor()
@@ -436,13 +421,21 @@ def atrophyvisualization(maskfile, allz, fname):
 		print(424)
 
 	# Get colorbar and combine 4 images to get final image!!!
-	img_lhl = cv2.imread(fname+'_lefthemosphere_lateral.png')
-	img_rhl = cv2.imread(fname+'_righthemosphere_lateral.png')
-	img_lm = cv2.imread(fname+'_left_medial.png')
-	img_rm = cv2.imread(fname+'_right_medial.png')
-	img_axialt = cv2.imread(fname+'_axialtop.png')
-	img_axialb = cv2.imread(fname+'_axialbottom.png')
-	img_bg_t_axial = cv2.imread(fname+'_bg_t_axial.png')
+	img_lhl = Image.open(fname+'_lefthemosphere_lateral.png').convert('RGB')
+	img_rhl = Image.open(fname+'_righthemosphere_lateral.png').convert('RGB')
+	img_lm = Image.open(fname+'_left_medial.png').convert('RGB')
+	img_rm = Image.open(fname+'_right_medial.png').convert('RGB')
+	img_axialt = Image.open(fname+'_axialtop.png').convert('RGB')
+	img_axialb = Image.open(fname+'_axialbottom.png').convert('RGB')
+	img_bg_t_axial = Image.open(fname+'_bg_t_axial.png').convert('RGB')
+
+	img_lhl = np.asarray(img_lhl)
+	img_rhl = np.asarray(img_rhl)
+	img_lm = np.asarray(img_lm)
+	img_rm = np.asarray(img_rm)
+	img_axialt = np.asarray(img_axialt)
+	img_axialb = np.asarray(img_axialb)
+	img_bg_t_axial = np.asarray(img_bg_t_axial)
 
 	# Alter spacing and overall image size here
 	x_dim_common = int(max(img_lhl.shape[0],img_rhl.shape[0],img_lm.shape[0],img_rm.shape[0],img_axialt.shape[0],img_axialb.shape[0],img_bg_t_axial.shape[0])*1.3)
@@ -508,7 +501,8 @@ def atrophyvisualization(maskfile, allz, fname):
 	final_outimg[x_dim_common:x_dim_common*2, y_dim_common*2:y_dim_common*3] = np.pad(img_bg_t_axial,((spcr_x,x_dim_common-img_bg_t_axial.shape[0]-spcr_x),(spcr_y,y_dim_common-img_bg_t_axial.shape[1]-spcr_y),(0,0)),'constant', constant_values=255)
 
 	# Add colorbar to edge of image array
-	cb = cv2.imread(fname+'_colorbar.png')
+	cb = Image.open(fname+'_colorbar.png').convert('RGB')
+	cb = np.asarray(cb)
 	#spcr_x = int((x_dim_common*2-cb.shape[0])/2)
 	#padded_cb = np.pad(cb,((spcr_x,x_dim_common*2-cb.shape[0]-spcr_x),(0,0),(0,0)),'constant', constant_values=255)
 	spcr_x = int((x_dim_common-cb.shape[0])/2)
@@ -521,10 +515,11 @@ def atrophyvisualization(maskfile, allz, fname):
 	final_outimg[x_dim_common:x_dim_common*2, y_dim_common*3:y_dim_common*4] = padded_cb
 
 	# Save array as image
-	cv2.imwrite(fname+'_finalvis.png', final_outimg)
+	Image.fromarray(np.uint8(final_outimg)).save(fname+'_finalvis.png')
 
-	img = Image.open(fname+'_finalvis.png')
+	img = Image.open(fname+'_finalvis.png').convert('RGB')
 	I1 = ImageDraw.Draw(img)
+	img = np.asarray(img)
 
 	# Declare font style and size
 	myFont = ImageFont.truetype("../refs/Times New Roman Bold.ttf", 25)
@@ -535,7 +530,6 @@ def atrophyvisualization(maskfile, allz, fname):
 	text_width_lm,text_height_lm = I1.textsize("Left hemisphere medial", font = myFont)
 	text_width_axialt,text_height_axialt = I1.textsize("Top", font = myFont)
 	text_width_bg_t_axial,text_height_bg_t_axial = I1.textsize("Basal-Ganglia/Thalamus Slice", font = myFont)
-
 
 	#Extract bounding boxes around each image to understand where to place text
 	# rhl
@@ -603,64 +597,19 @@ def atrophyvisualization(maskfile, allz, fname):
 	I1.text(pos_row2_axialt_r, "R", font = myFont, fill=(0, 0, 0))
 
 	# Final image save
+	img = Image.fromarray(np.uint8(img))
 	img.save(fname+'_finalvis.png')
 
-#roi = '/Users/vikasbommineni/Desktop/MRIreport/data/batch/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/deepmrseg/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607.nii.gz'
-#roi='/Users/vikasbommineni/Downloads/kaapana_failures_3May2023/F16/combined-neuropipeline-split-report-230502021529716126/batch/2.16.840.1.114362.1.12066432.24920037488.628638986.161.2319/merge-rois/2.16.840.1.114362.1.12066432.24920037488.628638986.161.2319.nii.gz'
-#with open('/Users/vikasbommineni/Desktop/MRIreport/data/batch/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/output/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607_allz_num.pkl','rb') as f:
-#	allz_num = pickle.load(f)
-#out = 'TEST_'
-
-#atrophyvisualization(roi,allz_num,out)
-
-#original 
-# def _main( roi, allz_num, pdf_path):
-# 	print(f'Entered main code logic')
-
-# 	UID = _os.path.basename(pdf_path.removesuffix(".pdf"))
-# 	out = _os.path.dirname(pdf_path)
-# 	out = out + '/' + UID
-
-# 	_os.environ['DISPLAY'] =':99.0'
-
-# 	commands = ['Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &','sleep 3','exec "$@"']
-
-# 	for command in commands:
-# 		subprocess.call(command,shell=True)
-
-# 	print(f'Entered main code logic')
-
-# 	atrophyvisualization(roi,allz_num,out)
-
-
-
 def _main( roi, allz_num, pdf_path):
-	print(f'Entered main code logic')
-
 	UID = _os.path.basename(pdf_path.removesuffix(".pdf"))
 	out = _os.path.dirname(pdf_path)
 	out = out + '/' + UID
 
-	# _os.environ['DISPLAY'] =':99.0'
+	_os.environ['DISPLAY'] =':99.0'
 
-	# commands = ['Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &','sleep 3','exec "$@"']
+	commands = ['Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &','sleep 3','exec "$@"']
 
-	# for command in commands:
-	# 	subprocess.call(command,shell=True)
-
-	print(f'Entered main code logic')
+	for command in commands:
+ 		subprocess.call(command,shell=True)
 
 	atrophyvisualization(roi,allz_num,out)
-
-# if __name__ == '__main__':
-# 	print(656)
-# 	roi = '/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/relabel/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607.nii.gz'
-# 	input = readimage(roi)
-# 	output = write_image(input,'/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/relabel/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607.nrrd')
-# 	print(659)
-# 	roi = '/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/relabel/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607.nrrd'
-# 	with open('/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/roi-quantification/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607_allz_num.pkl','rb') as f:
-# 		allz_num = pickle.load(f)
-
-	# pdf_path = '/home/diwu/Desktop/TIP/neurodegeneration/processing-containers/brainvisualize/files/test.pdf'
-	# _main( roi, allz_num, pdf_path)

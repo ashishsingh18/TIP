@@ -369,10 +369,10 @@ def _main(roi, icv, wmls, _json, out_path):
 	dfRef.rename(columns={'702':'ICV'}, inplace=True)
 
 	## Read wmls, if provided
-	wmlsVol = None
+	wmlsVol = 0
 	if len(wmls) == 1:
 		wmlsVol = calcMaskVolume(wmls[0])
-		dfSub['Total White Matter Hyperintensity Volume'] = wmlsVol
+	dfSub['Total White Matter Hyperintensity Volume'] = wmlsVol
 
 	### Add WMLS 604 reference datapoints to dfRef ###
 	WMLSref = pd.read_csv('/refs/WMLS_combinedrefs.csv').dropna()

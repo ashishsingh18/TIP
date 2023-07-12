@@ -344,7 +344,7 @@ def makeFlagTablePKL(dfRef,mydict,MUSErois,path):
 	with open(path, 'wb') as f:
 		pickle.dump(string, f)
 
-def _main(roi, dfSub, dfRef, WMLSref, allz_num, allz, all_MuseROIs_name, spareAD, spareBA, pdf_path):
+def _main(dfSub, dfRef, WMLSref, allz_num, allz, all_MuseROIs_name, spareAD, spareBA, pdf_path):
 	UID = _os.path.basename(pdf_path.removesuffix(".pdf"))
 	out = _os.path.dirname(pdf_path)
 

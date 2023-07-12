@@ -18,6 +18,8 @@ def reorient_image(image_path, orientation):
 
     #reorient image to input orientation
     reoriented = sitk.DICOMOrient(image, orientation)
+
+    print(reoriented.GetSize())
     
     return reoriented
 
@@ -34,10 +36,13 @@ def reorient_image_to_reference_image(image_path,reference_image_path):
 
     #reorient image to reference image orientation
     reoriented = reorient_image(image_path,orientation_ref)
+
+    print(reoriented.GetSize())
+
     return reoriented
 
 def _main(img,ref,choice,outpath):
     if choice == "None":
-        writeimage(reorient_image_to_reference_image(img[0],ref[0]))
+        writeimage(reorient_image_to_reference_image(img[0],ref[0]),outpath)
     else:
         writeimage(reorient_image(img[0],choice),outpath)

@@ -181,15 +181,16 @@ def writeHtml(plots, tables, flagtable, dftable, outName, brainplot):#, wmlstabl
 	f.write(html_string_test)
 	f.close()
 
-def _main(pdf_path,in_path_biomarker,in_path_quant):
+def _main(pdf_path,in_path_biomarker,in_path_quant,in_path_brainvis):
 	UID = str(_os.path.basename(pdf_path.removesuffix(".pdf")))
 	pdf_out = str(_os.path.dirname(pdf_path))
 	brainplot = []
 	plots = []
 	tables = []
 	flagtable = []
-
-	brainplot.append(_os.path.join(in_path_biomarker,UID+'_finalvis.png'))
+	print('Path to Brain Vis')
+	print(_os.path.join(in_path_brainvis,UID+'_finalvis.png'))
+	brainplot.append(_os.path.join(in_path_brainvis,UID+'_finalvis.png'))
 	plots.append(_os.path.join(in_path_biomarker,UID+'_plot.png'))
 
 	with open(_os.path.join(in_path_biomarker,UID+'_roisubsettable.pkl'),'rb') as f:
