@@ -1,6 +1,8 @@
-vtk
+--extra-index-url https://wheels.vtk.org
+vtk-osmesa
+opencv-python
 numpy
 pandas
 matplotlib
-opencv-python
+Pillow==9.3
 SimpleITK

@@ -18,10 +18,6 @@ batch_folders = sorted([f for f in glob.glob(os.path.join('/', os.environ['WORKF
 for batch_element_dir in batch_folders:
 
     print(f'Checking for pkl files')
-    roi = []
-
-    roi_input_dir = os.path.join(batch_element_dir, os.environ['OPERATOR_IN_DIR_ROI'])
-    roi = sorted(glob.glob(os.path.join(roi_input_dir, "*.nrrd*"), recursive=True))
 
     in_dir_quant = os.path.join(batch_element_dir, os.environ['OPERATOR_IN_DIR_QUANT'])
     in_dir_spare = os.path.join(batch_element_dir, os.environ['OPERATOR_IN_DIR_SPARE'])
@@ -62,4 +58,4 @@ for batch_element_dir in batch_folders:
     out_path=os.path.join(batch_element_dir, os.environ['OPERATOR_OUT_DIR'])
     pdf_file_path = os.path.join(out_path, "{}.pdf".format(os.path.basename(batch_element_dir)))
 
-    normative_biomarker_visualizer._main(roi[0], dfSub, dfRef, WMLSref, allz_num, allz, all_MuseROIs_name, spareAD, spareBA, pdf_file_path)
+    normative_biomarker_visualizer._main(dfSub, dfRef, WMLSref, allz_num, allz, all_MuseROIs_name, spareAD, spareBA, pdf_file_path)

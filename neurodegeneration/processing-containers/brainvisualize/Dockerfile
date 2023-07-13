@@ -6,7 +6,7 @@ LABEL VERSION="0.1.0"
 LABEL CI_IGNORE="True"
 
 RUN apt-get update
-RUN apt-get install -y libsm6 libxext6 libxrender-dev libgl1 libglib2.0-0 xvfb
+RUN apt-get install -y libsm6 libxext6 libxrender-dev libgl1-mesa-dev libglib2.0-0
 
 COPY requirements.txt ./
 
