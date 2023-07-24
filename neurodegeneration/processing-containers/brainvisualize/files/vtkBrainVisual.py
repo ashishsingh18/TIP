@@ -106,6 +106,83 @@ def generate_slice_view(fname,relabelMap,need2relabel):
 	imageViewer.Render()
 	iren.Start()
 
+def generate_image_plane_widget(fname,relabelMap,need2relabel):
+	reader_all = vtk.vtkNIFTIImageReader()
+	reader_all.SetFileName(fname)
+	castFilter_all = vtk.vtkImageCast()
+	castFilter_all.SetInputConnection(reader_all.GetOutputPort())
+	castFilter_all.SetOutputScalarTypeToUnsignedShort()
+	castFilter_all.Update()
+	imdataBrainSeg_all = castFilter_all.GetOutput()
+
+	#lut = get_lut()
+	lut = get_color_TF(relabelMap,need2relabel)
+	scalarValuesToColors = vtk.vtkImageMapToColors()
+	scalarValuesToColors.SetLookupTable(lut)
+	# scalarValuesToColors.PassAlphaToOutputOn()
+	scalarValuesToColors.SetInputData(imdataBrainSeg_all)
+	scalardata = scalarValuesToColors.GetOutput()
+
+	#renderer, iren, renwin
+	iren = vtk.vtkRenderWindowInteractor()
+	ren = vtk.vtkRenderer()
+	renwin = vtk.vtkRenderWindow()
+	iren.SetRenderWindow(renwin)
+	renwin.AddRenderer(ren)
+
+	planeWidgetX = vtk.vtkImagePlaneWidget()
+	planeWidgetX.SetInteractor( iren )
+	planeWidgetX.RestrictPlaneToVolumeOn()
+	# planeWidgetX.SetResliceInterpolateToNearestNeighbour()
+	planeWidgetX.SetInputData( imdataBrainSeg_all )
+	planeWidgetX.GetColorMap().SetLookupTable(lut)
+	planeWidgetX.SetPlaneOrientationToXAxes()
+	planeWidgetX.SetSliceIndex( 79 )
+	planeWidgetX.DisplayTextOn()
+	# planeWidgetX.SetResliceInterpolateToNearestNeighbour()
+	planeWidgetX.On()
+
+	#image plane widget
+	# plane_x = vtk.vtkImagePlaneWidget()
+	# plane_x.InteractionOff()
+	# plane_x.SetPlaneOrientationToXAxes()
+	# plane_x.TextureVisibilityOn()
+	# plane_x.SetLeftButtonAction(0)
+	# plane_x.SetRightButtonAction(0)
+	# plane_x.SetMiddleButtonAction(0)
+	# cursor_property = plane_x.GetCursorProperty()
+	# cursor_property.SetOpacity(0) 
+	# plane_x.SetDefaultRenderer(ren)
+	# plane_x.SetInputData(imdataBrainSeg_all)
+	# plane_x.On()
+	# plane_x.InteractionOn()
+
+	# plane_y = vtk.vtkImagePlaneWidget()
+	# plane_y.DisplayTextOff()
+	# #Publisher.sendMessage('Input Image in the widget', 
+	# 										#(plane_y, 'CORONAL'))
+	# plane_y.SetPlaneOrientationToYAxes()
+	# plane_y.TextureVisibilityOn()
+	# plane_y.SetLeftButtonAction(0)
+	# plane_y.SetRightButtonAction(0)
+	# plane_y.SetMiddleButtonAction(0)
+	# prop1 = plane_y.GetPlaneProperty()
+	# cursor_property = plane_y.GetCursorProperty()
+	# cursor_property.SetOpacity(0) 
+
+	# plane_z = vtk.vtkImagePlaneWidget()
+	# plane_z.InteractionOff()
+	# #Publisher.sendMessage('Input Image in the widget', 
+	# 										#(plane_z, 'AXIAL'))
+	# plane_z.SetPlaneOrientationToZAxes()
+	# plane_z.TextureVisibilityOn()
+	# plane_z.SetLeftButtonAction(0)
+	# plane_z.SetRightButtonAction(0)
+	# plane_z.SetMiddleButtonAction(0)
+
+	renwin.Render()
+	iren.Start()
+
 def hex_to_rgb(hex: str):
     hex = hex[1:]
     assert len(hex) == 6
@@ -152,29 +229,32 @@ def get_lut():
 	# lut.Build()
 	return lut
 
-def add_scalarbar(renderer):
+def add_scalarbar(renderer,relabelMap,need2relabel):
 	lut = get_lut()
+	# lut = get_color_TF(relabelMap,need2relabel)
 	# print(lut)
 	#scalar bar
 	scalarBarActor = vtk.vtkScalarBarActor()
 	scalarBarActor.SetLookupTable(lut)
-	scalarBarActor.SetNumberOfLabels(lut.GetNumberOfAvailableColors())
+	scalarBarActor.SetNumberOfLabels(5)
 	scalarBarActor.GetLabelTextProperty().ItalicOff()
 	scalarBarActor.GetLabelTextProperty().BoldOff()
 	scalarBarActor.GetLabelTextProperty().ShadowOff()
-	scalarBarActor.GetAnnotationTextProperty().SetFontSize(20)
-	scalarBarActor.GetLabelTextProperty().SetColor(1.0,0.0,0.0)
+	# scalarBarActor.GetAnnotationTextProperty().SetFontSize(20)
+	scalarBarActor.GetAnnotationTextProperty().SetColor(vtk.vtkNamedColors().GetColor3d("Black"))
 	scalarBarActor.SetLabelFormat('%.2f')
+	scalarBarActor.SetTitle('Z-Score')
+	scalarBarActor.GetTitleTextProperty().SetColor(vtk.vtkNamedColors().GetColor3d("Black"))
 	renderer.AddActor(scalarBarActor)
 
-def render_scalarbar():
+def render_scalarbar(relabelMap,need2relabel):
 	rw = vtk.vtkRenderWindow()
 	iren = vtk.vtkRenderWindowInteractor()
 	iren.SetRenderWindow(rw)
 	ren = vtk.vtkRenderer()
 	rw.AddRenderer(ren)
 	ren.SetBackground(0,0,1)
-	add_scalarbar(ren)
+	add_scalarbar(ren,relabelMap,need2relabel)
 
 	rw.Render()
 	rw.SetWindowName('scalarbar')
@@ -182,11 +262,38 @@ def render_scalarbar():
 
 	iren.Start()
 
+def add_light(ren,fname):
+	lgt = vtk.vtkLight()
+	# lgt.SetLightTypeToHeadlight()
+	lgt.SetLightTypeToCameraLight()
+	lgt.SetPosition(ren.GetActiveCamera().GetPosition())
+	lgt.SetFocalPoint(ren.GetActiveCamera().GetFocalPoint())
+	lgt.SwitchOn()
+	ren.AddLight(lgt)
+	ren.UpdateLightsGeometryToFollowCamera()
+
+	reader_all = vtk.vtkNIFTIImageReader()
+	reader_all.SetFileName(fname)
+	# castFilter_all = vtk.vtkImageCast()
+	# castFilter_all.SetInputConnection(reader_all.GetOutputPort())
+	# castFilter_all.SetOutputScalarTypeToUnsignedShort()
+	# castFilter_all.Update()
+	reader_all.Update()
+	vol = reader_all.GetOutput()
+
+	lgt2 = vtk.vtkLight()
+	lgt2.SetLightTypeToSceneLight()
+	lgt2.SetPositional(1)
+	lgt2.SetPosition(vol.GetCenter())
+	# lgt2.SetFocalPoint(ren.GetActiveCamera().GetFocalPoint())
+	lgt2.SwitchOn()
+	ren.AddLight(lgt2)
+
 def get_color_TF(relabelMap,need2relabel):
 	funcColor = vtk.vtkColorTransferFunction()
 
-	print('relabelmap: ', relabelMap)
-	print('need2relabel: ', need2relabel)
+	# print('relabelmap: ', relabelMap)
+	# print('need2relabel: ', need2relabel)
 
 	for idx in relabelMap.keys():
 		if idx in need2relabel:
@@ -203,9 +310,24 @@ def get_color_TF(relabelMap,need2relabel):
 				funcColor.AddRGBPoint(idx,189/255,0/255,38/255)
 		else:
 			funcColor.AddRGBPoint(idx,1,1,1)
+			# funcColor.AddRGBPoint(idx,1,0,0)
 
 	funcColor.AddRGBPoint(0,1,1,1)
 	return funcColor
+
+def get_imagedata(fname):
+	reader_all = vtk.vtkNIFTIImageReader()
+	reader_all.SetFileName(fname)
+	castFilter_all = vtk.vtkImageCast()
+	castFilter_all.SetInputConnection(reader_all.GetOutputPort())
+	castFilter_all.SetOutputScalarTypeToUnsignedShort()
+	castFilter_all.Update()
+	# print(castFilter_all.GetOutput())
+	# print("castFilter")
+	# exit()
+	imdataBrainSeg_all = castFilter_all.GetOutputPort()
+	idbs_all = castFilter_all.GetOutput()
+	return idbs_all
 
 def get_volume(fname,relabelMap,need2relabel,clip, orientation):
 	# for i in range(len(list_filenames)):
@@ -225,8 +347,8 @@ def get_volume(fname,relabelMap,need2relabel,clip, orientation):
 	# Define color legend #
 	funcColor = vtk.vtkColorTransferFunction()
 
-	print('relabelmap: ', relabelMap)
-	print('need2relabel: ', need2relabel)
+	# print('relabelmap: ', relabelMap)
+	# print('need2relabel: ', need2relabel)
 
 	for idx in relabelMap.keys():
 		if idx in need2relabel:
@@ -245,36 +367,60 @@ def get_volume(fname,relabelMap,need2relabel,clip, orientation):
 			funcColor.AddRGBPoint(idx,1,1,1)
 
 	funcColor.AddRGBPoint(0,1,1,1)
+	# funcColor.AddRGBPoint(35,0,1,0)
+	# funcColor.AddRGBPoint(46,0,0,1)
 
 	# Define opacity scheme #
 	funcOpacityScalar = vtk.vtkPiecewiseFunction()
-	funcOpacityScalar.AddPoint(0, 0)
+	gradopacity = vtk.vtkPiecewiseFunction()
+
 	for idx in relabelMap.keys():
 		funcOpacityScalar.AddPoint(idx, 1 if idx > 0 else 0.0)
+		gradopacity.AddPoint(idx, 1 if idx > 0 else 0.0)
+	funcOpacityScalar.AddPoint(0, 0)
+	# funcOpacityScalar.AddPoint(35, 0)
+
+	#gradient opacity
+
+	gradopacity.AddPoint(0, 0)
+	# gradopacity.AddPoint(35,0)
 
 	### WHOLE VOLUME ###
 	propVolume_all = vtk.vtkVolumeProperty()
+	# propVolume_all.SetIndependentComponents(0)
 	propVolume_all.SetColor(funcColor)
 	propVolume_all.SetScalarOpacity(funcOpacityScalar)
+	propVolume_all.SetGradientOpacity(gradopacity)
+	# propVolume_all.SetColor(get_lut())
 	propVolume_all.SetInterpolationTypeToNearest()
+	# propVolume_all.SetInterpolationTypeToLinear()
 	propVolume_all.ShadeOn()
 	propVolume_all.SetDiffuse(0.7)
-	propVolume_all.SetAmbient(0.8)
+	propVolume_all.SetAmbient(0.5)
+	propVolume_all.SetSpecular(0.2)
+	propVolume_all.SetSpecularPower(10.0)
+	propVolume_all.SetScalarOpacityUnitDistance(1)
 	volumeMapper_all = vtk.vtkFixedPointVolumeRayCastMapper()
+	# volumeMapper_all.SetBlendModeToComposite()
+	# volumeMapper_all = vtk.vtkGPUVolumeRayCastMapper()
 	volumeMapper_all.SetInputConnection(imdataBrainSeg_all)
+	print('center: ',idbs_all.GetCenter())
 	if(clip):
 		plane = vtk.vtkPlane()
 		if(orientation == title_top_row_from_left_2):
 			plane = vtk.vtkPlane()
 			plane.SetOrigin(idbs_all.GetCenter())
+			# plane.SetOrigin(39,idbs_all.GetCenter()[1],idbs_all.GetCenter()[2])
 			plane.SetNormal(-1,0,0)
 		elif(orientation == title_top_row_from_left_4):
 			plane = vtk.vtkPlane()
 			plane.SetOrigin(idbs_all.GetCenter())
+			# plane.SetOrigin(119,idbs_all.GetCenter()[1],idbs_all.GetCenter()[2])
 			plane.SetNormal(1,0,0)
 		elif(orientation == title_bottom_row_from_left_3):
 			plane = vtk.vtkPlane()
 			plane.SetOrigin(idbs_all.GetCenter())
+			# plane.SetOrigin(idbs_all.GetCenter()[0],idbs_all.GetCenter()[1],128)
 			plane.SetNormal(0,0,-1)
 		volumeMapper_all.AddClippingPlane(plane)
 
@@ -282,72 +428,6 @@ def get_volume(fname,relabelMap,need2relabel,clip, orientation):
 	volume_all.SetMapper(volumeMapper_all)
 	volume_all.SetProperty(propVolume_all)
 	return volume_all
-
-# def get_clipped_volume(fname,relabelMap,need2relabel):
-# 	# for i in range(len(list_filenames)):
-# 	# fname = list_filenames[i]
-# 	reader_all = vtk.vtkNIFTIImageReader()
-# 	reader_all.SetFileName(fname)
-# 	castFilter_all = vtk.vtkImageCast()
-# 	castFilter_all.SetInputConnection(reader_all.GetOutputPort())
-# 	castFilter_all.SetOutputScalarTypeToUnsignedShort()
-# 	castFilter_all.Update()
-# 	# print(castFilter_all.GetOutput())
-# 	# print("castFilter")
-# 	# exit()
-# 	imdataBrainSeg_all = castFilter_all.GetOutputPort()
-# 	idbs_all = castFilter_all.GetOutput()
-
-# 	# Define color legend #
-# 	funcColor = vtk.vtkColorTransferFunction()
-
-# 	for idx in relabelMap.keys():
-# 		if idx in need2relabel:
-# 			# TODO: create a fixed z-score based on most extreme of training data
-# 			if -1.036 <= relabelMap[idx] <= -.5244:
-# 				funcColor.AddRGBPoint(idx,255/255,255/255,178/255)
-# 			elif -1.645 <= relabelMap[idx] < -1.036:
-# 				funcColor.AddRGBPoint(idx,254/255,204/255,92/255)
-# 			elif -1.881 <= relabelMap[idx] < -1.645:
-# 				funcColor.AddRGBPoint(idx,253/255,141/255,60/255)
-# 			elif -2.326 <= relabelMap[idx] < -1.881:
-# 				funcColor.AddRGBPoint(idx,240/255,59/255,32/255)
-# 			elif relabelMap[idx] < -2.326:
-# 				funcColor.AddRGBPoint(idx,189/255,0/255,38/255)
-# 		else:
-# 			funcColor.AddRGBPoint(idx,1,1,1)
-
-# 	funcColor.AddRGBPoint(0,1,1,1)
-
-# 	# Define opacity scheme #
-# 	funcOpacityScalar = vtk.vtkPiecewiseFunction()
-# 	funcOpacityScalar.AddPoint(0, 0)
-# 	for idx in relabelMap.keys():
-# 		funcOpacityScalar.AddPoint(idx, 1 if idx > 0 else 0.0)
-
-# 	#create plane
-# 	plane = vtk.vtkPlane()
-# 	#plane.SetOrigin(-2.78,15.13,-4.41)
-# 	plane.SetOrigin(idbs_all.GetCenter())
-# 	plane.SetNormal(-1,0,0)
-
-# 	### WHOLE VOLUME ###
-# 	propVolume_all = vtk.vtkVolumeProperty()
-# 	propVolume_all.SetColor(funcColor)
-# 	propVolume_all.SetScalarOpacity(funcOpacityScalar)
-# 	propVolume_all.SetInterpolationTypeToNearest()
-# 	propVolume_all.ShadeOn()
-# 	propVolume_all.SetDiffuse(0.7)
-# 	propVolume_all.SetAmbient(0.8)
-# 	volumeMapper_all = vtk.vtkSmartVolumeMapper()
-# 	volumeMapper_all.SetInputConnection(imdataBrainSeg_all)
-# 	volumeMapper_all.AddClippingPlane(plane)
-
-# 	volume_all = vtk.vtkVolume()
-# 	volume_all.SetMapper(volumeMapper_all)
-# 	volume_all.SetProperty(propVolume_all)
-# 	return volume_all
-
 
 def save_screeenshot(rw,filename):
 	windowToImageFilter = vtk.vtkWindowToImageFilter()
@@ -360,12 +440,29 @@ def save_screeenshot(rw,filename):
 	writer.SetInputConnection(windowToImageFilter.GetOutputPort())
 	writer.Write()
 
-def setup_camera(orientation,renderer):
+def setup_camera(imgdata, orientation,renderer):
 	# pass
 	# cam = vtk.vtkcamera()
+	
+	origin = imgdata.GetOrigin()
+	spacing = imgdata.GetSpacing()
+	extent = imgdata.GetExtent()
+
 	if(orientation == title_bottom_row_from_left_2): #Top
 		renderer.ResetCamera()
 		camera =  renderer.GetActiveCamera()
+
+		#image center
+		# camera.SetParallelProjection(1)
+		# xc = origin[0] + 0.5*(extent[0] + extent[1])*spacing[0]
+		# yc = origin[1] + 0.5*(extent[2] + extent[3])*spacing[1]
+		# yd = (extent[3] - extent[2] + 1)*spacing[1]
+
+		# d = camera.GetDistance()
+		# camera.SetParallelScale(0.5*yd)
+		# camera.SetFocalPoint(xc,yc,0.0)
+		# camera.SetPosition(xc,yc,+d)
+
 		focus = camera.GetFocalPoint()
 		d = camera.GetDistance()
 
@@ -401,6 +498,17 @@ def setup_camera(orientation,renderer):
 		camera.Azimuth(180)
 		camera.OrthogonalizeViewUp()
 		renderer.ResetCameraClippingRange()
+
+		#image center
+		# camera.SetParallelProjection(1)
+		# xc = origin[0] + 0.5*(extent[0] + extent[1])*spacing[0]
+		# yc = origin[1] + 0.5*(extent[2] + extent[3])*spacing[1]
+		# yd = (extent[3] - extent[2] + 1)*spacing[1]
+
+		# d = camera.GetDistance()
+		# camera.SetParallelScale(0.5*yd)
+		# camera.SetFocalPoint(xc,yc,0.0)
+		# camera.SetPosition(xc,yc,+d)
 	if(orientation == title_bottom_row_from_left_3): #Basal Ganglia/Thalamus
 		renderer.ResetCamera()
 		camera =  renderer.GetActiveCamera()
@@ -409,12 +517,23 @@ def setup_camera(orientation,renderer):
 
 		distance = camera.GetDistance()
 		newdis = 0.6 * distance
-		# camera.SetPosition(focus[0],focus[1],focus[2]+newdis)
+		camera.SetPosition(focus[0],focus[1],focus[2]+newdis)
 
 		camera.SetFocalPoint(focus)
 		camera.SetViewUp(0,-1,0)
 		camera.OrthogonalizeViewUp()
 		renderer.ResetCameraClippingRange()
+
+		# image center
+		# camera.SetParallelProjection(1)
+		# xc = origin[0] + 0.5*(extent[0] + extent[1])*spacing[0]
+		# yc = origin[1] + 0.5*(extent[2] + extent[3])*spacing[1]
+		# yd = (extent[3] - extent[2] + 1)*spacing[1]
+
+		# d = camera.GetDistance()
+		# camera.SetParallelScale(0.5*yd)
+		# camera.SetFocalPoint(xc,yc,0.0)
+		# camera.SetPosition(xc,yc,+d)
 	if(orientation == title_top_row_from_left_1): #Right hemisphere lateral
 		renderer.ResetCamera()
 		camera =  renderer.GetActiveCamera()
@@ -427,10 +546,20 @@ def setup_camera(orientation,renderer):
 
 		camera.SetFocalPoint(focus)
 		camera.SetViewUp(0,0,1)
-		# camera.Roll(90)
-		# camera.
+
 		camera.OrthogonalizeViewUp()
 		renderer.ResetCameraClippingRange()
+
+		# image center
+		# camera.SetParallelProjection(1)
+		# xc = origin[0] + 0.5*(extent[0] + extent[1])*spacing[0]
+		# yc = origin[1] + 0.5*(extent[2] + extent[3])*spacing[1]
+		# yd = (extent[3] - extent[2] + 1)*spacing[1]
+
+		# d = camera.GetDistance()
+		# camera.SetParallelScale(0.5*yd)
+		# camera.SetFocalPoint(xc,yc,0.0)
+		# camera.SetPosition(xc,yc,+d)
 	if(orientation == title_top_row_from_left_2): #Right hemisphere medial
 		renderer.ResetCamera()
 		camera =  renderer.GetActiveCamera()
@@ -439,13 +568,23 @@ def setup_camera(orientation,renderer):
 
 		distance = camera.GetDistance()
 		newdis = 0.6 * distance
-		#camera.SetPosition(focus[0],focus[1]+newdis,focus[2])
 		camera.SetPosition(541.09,15.13,-4.41)
 
 		camera.SetFocalPoint(focus)
 		camera.SetViewUp(0,0,1)
 		camera.OrthogonalizeViewUp()
 		renderer.ResetCameraClippingRange()
+
+		# image center
+		# camera.SetParallelProjection(1)
+		# xc = origin[0] + 0.5*(extent[0] + extent[1])*spacing[0]
+		# yc = origin[1] + 0.5*(extent[2] + extent[3])*spacing[1]
+		# yd = (extent[3] - extent[2] + 1)*spacing[1]
+
+		# d = camera.GetDistance()
+		# camera.SetParallelScale(0.5*yd)
+		# camera.SetFocalPoint(xc,yc,0.0)
+		# camera.SetPosition(xc,yc,+d)
 	if(orientation == title_top_row_from_left_3): #Left hemisphere lateral
 		renderer.ResetCamera()
 		camera =  renderer.GetActiveCamera()
@@ -460,6 +599,17 @@ def setup_camera(orientation,renderer):
 		camera.SetViewUp(0,0,1)
 		camera.OrthogonalizeViewUp()
 		renderer.ResetCameraClippingRange()
+
+		# image center
+		# camera.SetParallelProjection(1)
+		# xc = origin[0] + 0.5*(extent[0] + extent[1])*spacing[0]
+		# yc = origin[1] + 0.5*(extent[2] + extent[3])*spacing[1]
+		# yd = (extent[3] - extent[2] + 1)*spacing[1]
+
+		# d = camera.GetDistance()
+		# camera.SetParallelScale(0.5*yd)
+		# camera.SetFocalPoint(xc,yc,0.0)
+		# camera.SetPosition(xc,yc,+d)
 	if(orientation == title_top_row_from_left_4): #Left hemisphere medial
 		renderer.ResetCamera()
 		camera =  renderer.GetActiveCamera()
@@ -468,13 +618,69 @@ def setup_camera(orientation,renderer):
 
 		distance = camera.GetDistance()
 		newdis = 0.6 * distance
-		#camera.SetPosition(focus[0],focus[1],(focus[2] + newdis))
 		camera.SetPosition(-546.67,15.13,-4.41)
 
 		camera.SetFocalPoint(focus)
 		camera.SetViewUp(0,0,1)
 		camera.OrthogonalizeViewUp()
-		renderer.ResetCameraClippingRange()		
+		renderer.ResetCameraClippingRange()	
+
+		# image center	
+		# camera.SetParallelProjection(1)
+		# xc = origin[0] + 0.5*(extent[0] + extent[1])*spacing[0]
+		# yc = origin[1] + 0.5*(extent[2] + extent[3])*spacing[1]
+		# yd = (extent[3] - extent[2] + 1)*spacing[1]
+
+		# d = camera.GetDistance()
+		# camera.SetParallelScale(0.5*yd)
+		# camera.SetFocalPoint(xc,yc,0.0)
+		# camera.SetPosition(xc,yc,+d)
+	# renderer.GetActiveCamera().SetParallelProjection(1)
+
+def viewport_border(renderer, color, last=False):
+    # Points start at upper right and proceed anti-clockwise
+    points = vtk.vtkPoints()
+    points.SetNumberOfPoints(4)
+    points.InsertPoint(0, 1, 1, 0)
+    points.InsertPoint(1, 0, 1, 0)
+    points.InsertPoint(2, 0, 0, 0)
+    points.InsertPoint(3, 1, 0, 0)
+
+    # Create cells and lines
+    cells = vtk.vtkCellArray()
+    lines = vtk.vtkPolyLine()
+
+    # Only draw last line if this is the last viewport
+    if last:
+        lines.GetPointIds().SetNumberOfIds(5)
+    else:
+        lines.GetPointIds().SetNumberOfIds(4)
+    for i in range(4):
+        lines.GetPointIds().SetId(i, i)
+    if last:
+        lines.GetPointIds().SetId(4, 0)
+    cells.InsertNextCell(lines)
+
+    # Now create the polydata and display it
+    poly = vtk.vtkPolyData()
+    poly.SetPoints(points)
+    poly.SetLines(cells)
+
+    # Use normalized viewport coordinates since they are independent of window size
+    coordinate = vtk.vtkCoordinate()
+    coordinate.SetCoordinateSystemToNormalizedViewport()
+
+    mapper = vtk.vtkPolyDataMapper2D()
+    mapper.SetInputData(poly)
+    mapper.SetTransformCoordinate(coordinate)
+
+    actor = vtk.vtkActor2D()
+    actor.SetMapper(mapper)
+    actor.GetProperty().SetColor(color)
+    actor.GetProperty().SetLineWidth(4.0)  # Line Width
+
+    renderer.AddViewProp(actor)
+
 
 def setup_vtk_pipeline(roi,allz_num,out):
 
@@ -482,12 +688,18 @@ def setup_vtk_pipeline(roi,allz_num,out):
 
 	list_filenames,need2relabel = generate_data_for_visualization(relabelMap,roi,allz_num,out)
 
-	generate_slice_view(list_filenames['all_filenameSegmentation'],relabelMap,need2relabel)
+	render_scalarbar(relabelMap,need2relabel)
+	#generate_slice_view(list_filenames['all_filenameSegmentation'],relabelMap,need2relabel)
+
+	# generate_image_plane_widget(list_filenames['all_filenameSegmentation'],relabelMap,need2relabel)
 	# exit()
 	# print(list_renderers.keys())
 	colors = vtk.vtkNamedColors()
 	# One render window, multiple viewports.
 	rw = vtk.vtkRenderWindow()
+	# rw.SetOffScreenRendering(1)
+	# rw.SetFullScreen(1)
+	rw.SetSize(1024,1024)
 	iren = vtk.vtkRenderWindowInteractor()
 	iren.SetRenderWindow(rw)
 
@@ -516,10 +728,13 @@ def setup_vtk_pipeline(roi,allz_num,out):
 		pos = viewport_positions[viewport_keys[i]]
 		# ren.SetWindowName(viewport_keys[i])
 		ren.SetViewport(pos[0], pos[1], pos[2], pos[3])
-		ren.SetBackground(colors.GetColor3d(ren_bkg[i]))
+		# ren.SetBackground(colors.GetColor3d(ren_bkg[i]))
+		ren.SetBackground(1,1,1)
+		viewport_border(ren,(0,0,1))
 		ren.ResetCamera()
 		list_renderers[viewport_keys[i]] = ren
 
+	imgdata = get_imagedata(list_filenames['all_filenameSegmentation'])
 	#add data to renderers
 	for i in  range(len(list_renderers)):
 	#	pass
@@ -531,22 +746,22 @@ def setup_vtk_pipeline(roi,allz_num,out):
 			 volume = get_volume(list_filenames['all_filenameSegmentation'],relabelMap,need2relabel,False,title_top_row_from_left_1)
 			 ren.AddVolume(volume)
 			 creat_title(ren,title_top_row_from_left_1)
-			 setup_camera(title_top_row_from_left_1,ren)
+			 setup_camera(imgdata,title_top_row_from_left_1,ren)
 		if(viewport_keys[i] == title_top_row_from_left_3):
 			volume = get_volume(list_filenames['all_filenameSegmentation'],relabelMap,need2relabel,False,title_top_row_from_left_3)
 			ren.AddVolume(volume)
 			creat_title(ren,title_top_row_from_left_3)
-			setup_camera(title_top_row_from_left_3,ren)
+			setup_camera(imgdata,title_top_row_from_left_3,ren)
 		if(viewport_keys[i] == title_bottom_row_from_left_1):
 			volume = get_volume(list_filenames['all_filenameSegmentation'],relabelMap,need2relabel,False,title_bottom_row_from_left_1)
 			ren.AddVolume(volume)
 			creat_title(ren,title_bottom_row_from_left_1)
-			setup_camera(title_bottom_row_from_left_1,ren)
+			setup_camera(imgdata,title_bottom_row_from_left_1,ren)
 		if(viewport_keys[i] == title_bottom_row_from_left_2):
 			volume = get_volume(list_filenames['all_filenameSegmentation'],relabelMap,need2relabel,False,title_bottom_row_from_left_2)
 			ren.AddVolume(volume)
 			creat_title(ren,title_bottom_row_from_left_2)
-			setup_camera(title_bottom_row_from_left_2,ren)
+			setup_camera(imgdata,title_bottom_row_from_left_2,ren)
 		elif(viewport_keys[i] == title_top_row_from_left_2):
 			#volume = get_volume(list_filenames['r_filenameSegmentation'],relabelMap,need2relabel)
 			#volume = get_volume(list_filenames['all_filenameSegmentation'],relabelMap,need2relabel)
@@ -560,22 +775,24 @@ def setup_vtk_pipeline(roi,allz_num,out):
 			# mapper = volume.GetMapper()
 			# mapper.AddClippingPlane(plane)
 			ren.AddVolume(volume)
+			# add_light(ren,list_filenames['all_filenameSegmentation'])
 			creat_title(ren,title_top_row_from_left_2)
-			setup_camera(title_top_row_from_left_2,ren)
+			setup_camera(imgdata,title_top_row_from_left_2,ren)
 		elif(viewport_keys[i] == title_top_row_from_left_4):
 			# volume = get_volume(list_filenames['l_filenameSegmentation'],relabelMap,need2relabel,True,title_top_row_from_left_4)
 			volume = get_volume(list_filenames['all_filenameSegmentation'],relabelMap,need2relabel,True,title_top_row_from_left_4)
 			ren.AddVolume(volume)
+			# get_RHM_slice(ren,list_filenames['all_filenameSegmentation'])
 			creat_title(ren,title_top_row_from_left_4)
-			setup_camera(title_top_row_from_left_4,ren)
+			setup_camera(imgdata,title_top_row_from_left_4,ren)
 		elif(viewport_keys[i] == title_bottom_row_from_left_3):
 			# volume = get_volume(list_filenames['bg_t_filenameSegmentation'],relabelMap,need2relabel,True,title_bottom_row_from_left_3)
 			volume = get_volume(list_filenames['all_filenameSegmentation'],relabelMap,need2relabel,True,title_bottom_row_from_left_3)
 			ren.AddVolume(volume)
 			creat_title(ren,title_bottom_row_from_left_3)
-			setup_camera(title_bottom_row_from_left_3,ren)
+			setup_camera(imgdata,title_bottom_row_from_left_3,ren)
 		elif(viewport_keys[i] == title_bottom_row_from_left_4): #bottom row, last renderer for colorbar
-			add_scalarbar(ren)
+			add_scalarbar(ren,relabelMap,need2relabel)
 			# pass
 				
 
@@ -587,7 +804,7 @@ def setup_vtk_pipeline(roi,allz_num,out):
 	#setup camera orientation on renderers
 
 	rw.Render()
-	rw.SetWindowName('MultipleViewPorts')
+	rw.SetWindowName('F2 report screenshot')
 	# rw.SetSize(600, 600)
 
 	save_screeenshot(rw,"all.png")
@@ -631,6 +848,9 @@ def get_relabel_map(maskfile, allz):
 def generate_data_for_visualization(relabelMap,maskfile,allz,fname):
 	muse_labelmap=readimage(maskfile)
 	roi_zscore_dict=allz
+	# print('roi_score_dict')
+	# print(roi_zscore_dict)
+	# exit()
 	# Scale values less than -0.524 from yellow to red
 	rzd = list(roi_zscore_dict.values())
 	rzd = [i for i in rzd if (i <= -0.5244)]
