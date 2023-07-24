@@ -17,7 +17,7 @@ from PIL import ImageFont
 from createcmap import get_continuous_cmap
 
 #maphemi = pd.read_csv('/Users/vikasbommineni/Desktop/MRIreport/brainvisualize/refs/MUSE_ROI_Dictionary.csv')
-maphemi = pd.read_csv('refs/MUSE_ROI_Dictionary.csv')
+maphemi = pd.read_csv('../refs/MUSE_ROI_Dictionary.csv')
 
 # def write_image(img, output_file_path):
 #     writer = sitk.ImageFileWriter()
@@ -79,19 +79,19 @@ def vtk_show(orientation, fname, renderer, width=400, height=300):
     elif orientation == 'lefthemosphere_lateral':
         imgrot = cv2.rotate(img,cv2.ROTATE_180)
     elif orientation == 'righthemosphere_lateral':
-    	imgrot = cv2.rotate(img,cv2.ROTATE_180)
-
-    ### Delete associated file for each of the following screenshot images to clear up space ###
+        imgrot = cv2.rotate(img,cv2.ROTATE_180)
+	    
+	### Delete associated file for each of the following screenshot images to clear up space ###
     elif orientation == 'right_medial':
-    	_os.remove(fname+'_r.nii.gz')
-    	imgrot = cv2.rotate(img,cv2.ROTATE_180)
+        _os.remove(fname+'_r.nii.gz')
+        imgrot = cv2.rotate(img,cv2.ROTATE_180)
     elif orientation == 'left_medial':
-    	_os.remove(fname+'_l.nii.gz')
-    	imgrot = cv2.rotate(img,cv2.ROTATE_180)
+        _os.remove(fname+'_l.nii.gz')
+        imgrot = cv2.rotate(img,cv2.ROTATE_180)
     elif orientation == 'bg_t_axial':
-    	_os.remove(fname+'_bg_t.nii.gz')
-    	imgrot = cv2.rotate(img,cv2.ROTATE_90_CLOCKWISE)
-
+        _os.remove(fname+'_bg_t.nii.gz')
+        imgrot = cv2.rotate(img,cv2.ROTATE_90_CLOCKWISE)
+    
     crop_and_write(imgrot,orientation,fname,width,height)
 
 def readimage(input_file_path):
@@ -130,19 +130,25 @@ def atrophyvisualization(maskfile, allz, fname):
 	# Scale values less than -0.524 from yellow to red
 	rzd = list(roi_zscore_dict.values())
 	rzd = [i for i in rzd if (i <= -0.5244)]
-	#min_zscore = min(min(rzd),-3)
+	#min_zscore = min(min(rzd),-3) # -2.326
 	# 1st percentile z-score equivalent
-	min_zscore = -2.326
-	need2relabel = [int(k) for k,v in roi_zscore_dict.items() if float(v) <= -0.524]
-	relabelGray = [int(k) for k in relabelMap.keys() if k not in need2relabel]
+	min_zscore = -2.326  ### first percentile
+	need2relabel = [int(k) for k,v in roi_zscore_dict.items() if float(v) <= -0.524] ### 30th percentile upper bound 
+	#relabelGray = [int(k) for k in relabelMap.keys() if k not in need2relabel]
 
 	nda_all = sitk.GetArrayFromImage(muse_labelmap)
 	nda_l = sitk.GetArrayFromImage(muse_labelmap)
 	nda_r = sitk.GetArrayFromImage(muse_labelmap)
 	nda_bg_t = sitk.GetArrayFromImage(muse_labelmap)
 
+	print(nda_all.shape)
+	print(nda_l.shape)
+	print(nda_r.shape)
+	print(nda_bg_t.shape)
+
 	# TODO: get equitable split
 	bg_t = ((nda_bg_t == 59) | (nda_bg_t == 60) | (nda_bg_t == 23) | (nda_bg_t == 30) | (nda_bg_t == 36) | (nda_bg_t == 37) | (nda_bg_t == 55) | (nda_bg_t == 56) | (nda_bg_t == 57) | (nda_bg_t == 58)).astype(int)
+	print(bg_t.shape)
 	cnt = np.inf
 	bg_t_slice = 0
 	for y in range(bg_t.shape[1]):
@@ -152,6 +158,7 @@ def atrophyvisualization(maskfile, allz, fname):
 
 	# Set voxels to 0 above V.O.I
 	nda_bg_t[:,:bg_t_slice,:] = 0
+	print('bgt slice: ', bg_t_slice)
 
 	# Get transition point from left to right hemisphere from corpus callosum
 	cc = (nda_all == 95).astype(int)
@@ -163,6 +170,8 @@ def atrophyvisualization(maskfile, allz, fname):
 		if abs(np.sum(cc[x:,:,:])-np.sum(cc[:x,:,:])) < cnt:
 			mid_slice = x
 			cnt = abs(np.sum(cc[x:,:,:])-np.sum(cc[:x,:,:]))
+
+	print('mid slice: ', mid_slice)
 
 	# Set voxels to 0 based on middle slice
 	nda_l[mid_slice:,:,:] = 0
@@ -235,18 +244,26 @@ def atrophyvisualization(maskfile, allz, fname):
 	# Define color legend #
 	funcColor = vtk.vtkColorTransferFunction()
 
+	PERCENTILE_1  = -2.326
+	PERCENTILE_3  = -1.881
+	PERCENTILE_6  = -1.645
+	PERCENTILE_15 = -1.036
+	PERCENTILE_30 = -0.5244
+
 	for idx in relabelMap.keys():
 		if idx in need2relabel:
 			# TODO: create a fixed z-score based on most extreme of training data
-			if -1.036 <= relabelMap[idx] <= -.5244:
+
+			## below value chosen by Ilya as standard buckets
+			if PERCENTILE_15 <= relabelMap[idx] <= PERCENTILE_30:   
 				funcColor.AddRGBPoint(idx,255/255,255/255,178/255)
-			elif -1.645 <= relabelMap[idx] < -1.036:
+			elif PERCENTILE_6 <= relabelMap[idx] < PERCENTILE_15: 
 				funcColor.AddRGBPoint(idx,254/255,204/255,92/255)
-			elif -1.881 <= relabelMap[idx] < -1.645:
+			elif PERCENTILE_3 <= relabelMap[idx] < PERCENTILE_6:  
 				funcColor.AddRGBPoint(idx,253/255,141/255,60/255)
-			elif -2.326 <= relabelMap[idx] < -1.881:
+			elif PERCENTILE_1 <= relabelMap[idx] < PERCENTILE_3:  
 				funcColor.AddRGBPoint(idx,240/255,59/255,32/255)
-			elif relabelMap[idx] < -2.326:
+			elif relabelMap[idx] < PERCENTILE_1: 
 				funcColor.AddRGBPoint(idx,189/255,0/255,38/255)
 		else:
 			funcColor.AddRGBPoint(idx,1,1,1)
@@ -504,7 +521,7 @@ def atrophyvisualization(maskfile, allz, fname):
 	I1 = ImageDraw.Draw(img)
 
 	# Declare font style and size
-	myFont = ImageFont.truetype("refs/Times New Roman Bold.ttf", 25)
+	myFont = ImageFont.truetype("../refs/Times New Roman Bold.ttf", 25)
 	text_width_rhl,text_height_rhl = I1.textsize("Right hemisphere lateral",myFont)
 	text_width_rm,text_height_rm = I1.textsize("Right hemisphere medial",myFont)
 	text_width_axialb,text_height_axialb = I1.textsize("Bottom",myFont)
@@ -594,3 +611,16 @@ def _main( roi, allz_num, pdf_path):
 	#	subprocess.call(command,shell=True)
 
 	atrophyvisualization(roi,allz_num,out)
+
+
+if __name__ == '__main__':
+	# print(599)
+	roi = '/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/relabel/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607.nii.gz'
+	input = readimage(roi)
+	output = write_image(input,'/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/relabel/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607.nrrd')
+	# print(603)
+	roi_file = '/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/relabel/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607.nrrd'
+	with open('/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/roi-quantification/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607_allz_num.pkl','rb') as f:
+		allz_num = pickle.load(f)
+	pdf_path = './test.pdf'
+	_main( roi_file, allz_num, pdf_path)
