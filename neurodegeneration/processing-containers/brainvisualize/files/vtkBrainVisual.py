@@ -13,6 +13,7 @@ import subprocess
 from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
+from vtkmodules.vtkCommonCore import vtkMath
 
 from createcmap import get_continuous_cmap
 from enum import Enum
@@ -113,7 +114,7 @@ def hex_to_rgb(hex: str):
 	# return [int(hex[i:i + 2], 16) for i in (0, 2, 4)]
 	rgb = [int(hex[i:i + 2], 16) for i in (0, 2, 4)]
 	rgb = [x/256 for x in rgb]
-	print(rgb)
+	#print(rgb)
 	return rgb
 
 def get_lut():
@@ -122,7 +123,7 @@ def get_lut():
 	colors = ['#bd0026','#f03b20','#fd8d3c','#fecc5c','#ffffb2']
 	values = [min_zscore-1,min_zscore,-1.881,-1.645,-1.036,-.5244]
 	nvals = len(colors)
-	print("len: ", nvals)
+	#print("len: ", nvals)
 	lut = vtk.vtkLookupTable()
 	lut.SetNumberOfTableValues(nvals)
 	lut.SetTableRange(min_zscore-1,-0.5244)	
@@ -130,7 +131,7 @@ def get_lut():
 	i = 0
 	for k in colors:
 		rgba = hex_to_rgb(colors[i]) + [1] #[1] for opacity in rgba
-		print("k: ", k, " rgb: ", rgba)
+		#print("k: ", k, " rgb: ", rgba)
 		lut.SetTableValue(i,rgba)
 		lut.SetAnnotation(vtk.vtkVariant(i),str(values[i]))
 		#print("k: ", k, " cmlabels: ", cmlabels[0][i])
@@ -192,8 +193,8 @@ def render_scalarbar():
 def get_color_TF(relabelMap,need2relabel):
 	funcColor = vtk.vtkColorTransferFunction()
 
-	print('relabelmap: ', relabelMap)
-	print('need2relabel: ', need2relabel)
+	# print('relabelmap: ', relabelMap)
+	# print('need2relabel: ', need2relabel)
 
 	for idx in relabelMap.keys():
 		if idx in need2relabel:
@@ -219,10 +220,10 @@ def get_plane_from_mri(fname):
 	muse_labelmap = sitk.ReadImage(fname)
 	nda_bg_t = sitk.GetArrayFromImage(muse_labelmap)
 
-	print('image shape is: ', nda_bg_t.shape)
+	# print('image shape is: ', nda_bg_t.shape)
 
 	bg_t = ((nda_bg_t == 59) | (nda_bg_t == 60) | (nda_bg_t == 23) | (nda_bg_t == 30) | (nda_bg_t == 36) | (nda_bg_t == 37) | (nda_bg_t == 55) | (nda_bg_t == 56) | (nda_bg_t == 57) | (nda_bg_t == 58)).astype(int)
-	print(bg_t.shape)
+	# print(bg_t.shape)
 	cnt = np.inf
 	bg_t_slice = 0
 	# for y in range(bg_t.shape[1]):
@@ -237,7 +238,7 @@ def get_plane_from_mri(fname):
 		
 	# Set voxels to 0 above V.O.I
 	# nda_bg_t[:,:bg_t_slice,:] = 0
-	print('bgt slice: ', bg_t_slice)
+	# print('bgt slice: ', bg_t_slice)
 
 	# Get transition point from left to right hemisphere from corpus callosum
 	nda_all = nda_bg_t
@@ -251,7 +252,7 @@ def get_plane_from_mri(fname):
 			mid_slice = y
 			cnt = abs(np.sum(cc[:,:y,:]) - np.sum(cc[:,y:,:]))
 
-	print('mid slice: ', mid_slice)
+	# print('mid slice: ', mid_slice)
 
 	return bg_t_slice, mid_slice
 
@@ -328,13 +329,13 @@ def get_volume(fname,relabelMap,need2relabel,clip, orientation, *args):
 		plane = vtk.vtkPlane()
 		if(orientation == title_top_row_from_left_2):
 
-			print('left 2', idbs_all.GetCenter())
+			# print('left 2', idbs_all.GetCenter())
 
 			plane = vtk.vtkPlane()
 			origin = list(idbs_all.GetCenter())
 			origin[1] = mid_slice
 
-			print('origin', origin)
+			# print('origin', origin)
 			plane.SetOrigin(origin)
 			plane.SetNormal(-1,0,0)
 
@@ -342,13 +343,13 @@ def get_volume(fname,relabelMap,need2relabel,clip, orientation, *args):
 			# plane.SetOrigin(idbs_all.GetCenter()) #[x, y, z]
 			# plane.SetNormal(-1,0,0)
 		elif(orientation == title_top_row_from_left_4):
-			print('left 4', idbs_all.GetCenter())
+			# print('left 4', idbs_all.GetCenter())
 
 			plane = vtk.vtkPlane()
 			origin = list(idbs_all.GetCenter())
 			origin[1] = mid_slice
 
-			print('origin', origin)
+			# print('origin', origin)
 			plane.SetOrigin(origin)
 			plane.SetNormal(1,0,0)
 
@@ -357,13 +358,13 @@ def get_volume(fname,relabelMap,need2relabel,clip, orientation, *args):
 			# plane.SetNormal(1,0,0)
 		elif(orientation == title_bottom_row_from_left_3):
 
-			print('left 3', idbs_all.GetCenter())
+			# print('left 3', idbs_all.GetCenter())
 
 			plane = vtk.vtkPlane()
 			origin = list(idbs_all.GetCenter())
 			origin[2] = bg_t_slice
 
-			print('origin', origin)
+			# print('origin', origin)
 			plane.SetOrigin(origin)
 			plane.SetNormal(0,0,-1)
 			# plane = vtk.vtkPlane()
@@ -397,8 +398,13 @@ def setup_camera(orientation,renderer):
 		d = camera.GetDistance()
 
 		distance = camera.GetDistance()
-		newdis = 0.75 * distance
+		# newdis = 0.75 * distance
+		newdis = 0.7 * distance
 		camera.SetPosition(focus[0],focus[1],(focus[2] + newdis))
+
+		# p0 = (focus[0],focus[1],focus[2]+newdis)
+		# p1 = focus 
+		# print('bottom_row_from_left_2:', np.sqrt(vtkMath.Distance2BetweenPoints(p0, p1)))
 
 		camera.SetFocalPoint(focus)
 		camera.SetViewUp(0,-1,0)
@@ -414,11 +420,19 @@ def setup_camera(orientation,renderer):
 		newdis = 0.7 * distance
 		camera.SetPosition(focus[0],focus[1],(focus[2] + newdis))
 
+		# p0 = (focus[0],focus[1],focus[2]+newdis)
+		# p1 = focus 
+		# print('bottom_row_from_left_1:', np.sqrt(vtkMath.Distance2BetweenPoints(p0, p1)))
+
+
+
 		camera.SetFocalPoint(focus)
 		camera.SetViewUp(0,-1,0)
 		camera.Azimuth(180)
 		camera.OrthogonalizeViewUp()
 		renderer.ResetCameraClippingRange()
+		print(camera)
+
 	if(orientation == title_bottom_row_from_left_3): #Basal Ganglia/Thalamus
 		renderer.ResetCamera()
 		camera =  renderer.GetActiveCamera()
@@ -426,8 +440,13 @@ def setup_camera(orientation,renderer):
 		d = camera.GetDistance()
 
 		distance = camera.GetDistance()
-		newdis = 0.75 * distance
+		# newdis = 0.75 * distance
+		newdis = 0.7 * distance
 		camera.SetPosition(focus[0],focus[1],focus[2]+newdis)
+
+		# p0 = (focus[0],focus[1],focus[2]+newdis)
+		# p1 = focus 
+		# print('bottom_row_from_left_3:', np.sqrt(vtkMath.Distance2BetweenPoints(p0, p1)))
 
 		camera.SetFocalPoint(focus)
 		camera.SetViewUp(0,-1,0)
@@ -440,8 +459,15 @@ def setup_camera(orientation,renderer):
 		d = camera.GetDistance()
 
 		distance = camera.GetDistance()
-		newdis = 0.75 * distance
+		# newdis = 0.75 * distance
+		newdis = 0.7 * distance
 		camera.SetPosition((focus[0] + newdis),focus[1],focus[2])
+
+
+		# p0 = ( focus[0] +newdis,focus[1],focus[2] )
+		# p1 = focus 
+		# print('top_row_from_left_1:', np.sqrt(vtkMath.Distance2BetweenPoints(p0, p1)))
+		
 
 		camera.SetFocalPoint(focus)
 		camera.SetViewUp(0,0,1)
@@ -457,9 +483,17 @@ def setup_camera(orientation,renderer):
 
 		distance = camera.GetDistance()
 		newdis = 0.7 * distance
-		camera.SetPosition(focus[0],focus[1],focus[2]+newdis)
-		camera.SetPosition(541.09,15.13,-4.41)
+		# camera.SetPosition(focus[0],focus[1],focus[2]+newdis)
+		camera.SetPosition(focus[0] + newdis,focus[1],focus[2])
+
+		print('Top Left 2', focus[0] +newdis,focus[1],focus[2])
+		#camera.SetPosition(541.09,15.13,-4.41)
 		#camera.SetPosition(focus[0],focus[1]+newdis,focus[2])
+
+
+		# p0 = ( focus[0],focus[1],focus[2]+newdis )
+		# p1 = focus 
+		# print('Right hemisphere medial:', np.sqrt(vtkMath.Distance2BetweenPoints(p0, p1)))
 		
 
 		camera.SetFocalPoint(focus)
@@ -474,8 +508,13 @@ def setup_camera(orientation,renderer):
 		d = camera.GetDistance()
 
 		distance = camera.GetDistance()
-		newdis = 0.55 * distance
-		camera.SetPosition(-(focus[0] + newdis),focus[1],focus[2])
+		# newdis = 0.55 * distance
+		newdis = 0.7 * distance
+		camera.SetPosition((focus[0] - newdis),focus[1],focus[2])
+
+		# p0 = ( (focus[0] - newdis),focus[1],focus[2] )
+		# p1 = focus 
+		# print('top_row_from_left_3', np.sqrt(vtkMath.Distance2BetweenPoints(p0, p1)))
 
 		camera.SetFocalPoint(focus)
 		camera.SetViewUp(0,0,1)
@@ -488,13 +527,20 @@ def setup_camera(orientation,renderer):
 		d = camera.GetDistance()
 
 		distance = camera.GetDistance()
-		newdis = 0.6 * distance
-		camera.SetPosition(-(focus[0] + newdis),focus[1],focus[2])
+		# newdis = 0.6 * distance
+		newdis = 0.7 * distance
+		camera.SetPosition((focus[0] - newdis),focus[1],focus[2])
+
+		# p0 = ( (focus[0] - newdis),focus[1],focus[2] )
+		# p1 = focus 
+		# print('top_row_from_left_4:', np.sqrt(vtkMath.Distance2BetweenPoints(p0, p1)))
 
 		camera.SetFocalPoint(focus)
 		camera.SetViewUp(0,0,1)
 		camera.OrthogonalizeViewUp()
 		renderer.ResetCameraClippingRange()	
+
+		print(camera)
 
 
 def setup_vtk_pipeline(roi,allz_num,out):
@@ -729,15 +775,18 @@ def _main( roi, allz_num, pdf_path):
 	setup_vtk_pipeline(roi,allz_num,out)
 
 if __name__ == '__main__':
-	# print(599)
-	#roi = '/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/relabel/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607.nii.gz'
-	roi = 'D:\\ashish\\work\\projects\\KaapanaStuff\\data\\brainvis_error\\F2\\2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607\\relabel\\2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607.nii.gz'
-	input = readimage(roi)
-	#output = write_image(input,'/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/relabel/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607.nrrd')
-	output = write_image(input,'D:\\ashish\\work\\projects\\KaapanaStuff\\data\\brainvis_error\\F2\\2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607\\relabel\\2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607.nrrd')
-	# print(603)
-	roi_file = 'D:\\ashish\\work\\projects\\KaapanaStuff\\data\\brainvis_error\\F2\\2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607\\relabel\\2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607.nrrd'
-	with open('D:\\ashish\\work\\projects\\KaapanaStuff\\data\\brainvis_error\\F2\\2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607\\roi-quantification\\2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607_allz_num.pkl','rb') as f:
+	# roi = '/home/diwu/Desktop/kaapana-data-to-check-brainviz/F7/2.16.840.1.114362.1.12066432.24920037488.604832617.475.5969/relabel/2.16.840.1.114362.1.12066432.24920037488.604832617.475.5969.nii.gz'
+	# input = readimage(roi)
+	# output = write_image(input,'/home/diwu/Desktop/kaapana-data-to-check-brainviz/F7/2.16.840.1.114362.1.12066432.24920037488.604832617.475.5969/relabel/2.16.840.1.114362.1.12066432.24920037488.604832617.475.5969.nrrd')
+	roi_file = '/home/diwu/Desktop/kaapana-data-to-check-brainviz/F1/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168/relabel/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168.nrrd'
+	with open('/home/diwu/Desktop/kaapana-data-to-check-brainviz/F1/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168/roi-quantification/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168_allz_num.pkl','rb') as f:
 		allz_num = pickle.load(f)
 	pdf_path = './test.pdf'
 	_main( roi_file, allz_num, pdf_path)
+
+	# # F2
+	# roi_file = '/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/relabel/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607.nrrd'
+	# with open('/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/roi-quantification/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607_allz_num.pkl','rb') as f:
+	# 	allz_num = pickle.load(f)
+	# pdf_path = './test.pdf'
+	# _main( roi_file, allz_num, pdf_path)
