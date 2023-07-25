@@ -61,7 +61,8 @@ def getbounds(arr):
 def creat_title(renderer, text):
 	# Create a title
 	titleProperty = vtk.vtkTextProperty()
-	titleProperty.SetFontSize(16)
+	titleProperty.SetFontSize(20)
+	titleProperty.SetBold(1)
 	titleProperty.SetJustificationToCentered()
 
 	titleMapper = vtk.vtkTextMapper()
@@ -157,15 +158,21 @@ def add_scalarbar(renderer):
 	# print(lut)
 	#scalar bar
 	scalarBarActor = vtk.vtkScalarBarActor()
+	scalarBarActor.SetPosition(0.3,0.1)
 	scalarBarActor.SetLookupTable(lut)
+	scalarBarActor.SetTextPositionToPrecedeScalarBar()
 	scalarBarActor.SetNumberOfLabels(lut.GetNumberOfAvailableColors())
 	scalarBarActor.GetLabelTextProperty().ItalicOff()
 	scalarBarActor.GetLabelTextProperty().BoldOff()
 	scalarBarActor.GetLabelTextProperty().ShadowOff()
-	scalarBarActor.GetAnnotationTextProperty().SetFontSize(20)
-	scalarBarActor.GetLabelTextProperty().SetColor(1.0,0.0,0.0)
+	scalarBarActor.GetAnnotationTextProperty().SetFontSize(16)
+	scalarBarActor.GetAnnotationTextProperty().SetColor(vtk.vtkNamedColors().GetColor3d("Black"))
 	scalarBarActor.SetLabelFormat('%.2f')
-	renderer.AddActor(scalarBarActor)
+	scalarBarActor.SetTitle('Z-Score')
+	scalarBarActor.GetTitleTextProperty().SetColor(vtk.vtkNamedColors().GetColor3d("Black"))
+	scalarBarActor.GetTitleTextProperty().SetFontSize(20)
+	renderer.AddActor(scalarBarActor)	
+	
 
 def render_scalarbar():
 	rw = vtk.vtkRenderWindow()
@@ -369,72 +376,6 @@ def get_volume(fname,relabelMap,need2relabel,clip, orientation, *args):
 	volume_all.SetProperty(propVolume_all)
 	return volume_all
 
-# def get_clipped_volume(fname,relabelMap,need2relabel):
-# 	# for i in range(len(list_filenames)):
-# 	# fname = list_filenames[i]
-# 	reader_all = vtk.vtkNIFTIImageReader()
-# 	reader_all.SetFileName(fname)
-# 	castFilter_all = vtk.vtkImageCast()
-# 	castFilter_all.SetInputConnection(reader_all.GetOutputPort())
-# 	castFilter_all.SetOutputScalarTypeToUnsignedShort()
-# 	castFilter_all.Update()
-# 	# print(castFilter_all.GetOutput())
-# 	# print("castFilter")
-# 	# exit()
-# 	imdataBrainSeg_all = castFilter_all.GetOutputPort()
-# 	idbs_all = castFilter_all.GetOutput()
-
-# 	# Define color legend #
-# 	funcColor = vtk.vtkColorTransferFunction()
-
-# 	for idx in relabelMap.keys():
-# 		if idx in need2relabel:
-# 			# TODO: create a fixed z-score based on most extreme of training data
-# 			if -1.036 <= relabelMap[idx] <= -.5244:
-# 				funcColor.AddRGBPoint(idx,255/255,255/255,178/255)
-# 			elif -1.645 <= relabelMap[idx] < -1.036:
-# 				funcColor.AddRGBPoint(idx,254/255,204/255,92/255)
-# 			elif -1.881 <= relabelMap[idx] < -1.645:
-# 				funcColor.AddRGBPoint(idx,253/255,141/255,60/255)
-# 			elif -2.326 <= relabelMap[idx] < -1.881:
-# 				funcColor.AddRGBPoint(idx,240/255,59/255,32/255)
-# 			elif relabelMap[idx] < -2.326:
-# 				funcColor.AddRGBPoint(idx,189/255,0/255,38/255)
-# 		else:
-# 			funcColor.AddRGBPoint(idx,1,1,1)
-
-# 	funcColor.AddRGBPoint(0,1,1,1)
-
-# 	# Define opacity scheme #
-# 	funcOpacityScalar = vtk.vtkPiecewiseFunction()
-# 	funcOpacityScalar.AddPoint(0, 0)
-# 	for idx in relabelMap.keys():
-# 		funcOpacityScalar.AddPoint(idx, 1 if idx > 0 else 0.0)
-
-# 	#create plane
-# 	plane = vtk.vtkPlane()
-# 	#plane.SetOrigin(-2.78,15.13,-4.41)
-# 	plane.SetOrigin(idbs_all.GetCenter())
-# 	plane.SetNormal(-1,0,0)
-
-# 	### WHOLE VOLUME ###
-# 	propVolume_all = vtk.vtkVolumeProperty()
-# 	propVolume_all.SetColor(funcColor)
-# 	propVolume_all.SetScalarOpacity(funcOpacityScalar)
-# 	propVolume_all.SetInterpolationTypeToNearest()
-# 	propVolume_all.ShadeOn()
-# 	propVolume_all.SetDiffuse(0.7)
-# 	propVolume_all.SetAmbient(0.8)
-# 	volumeMapper_all = vtk.vtkSmartVolumeMapper()
-# 	volumeMapper_all.SetInputConnection(imdataBrainSeg_all)
-# 	volumeMapper_all.AddClippingPlane(plane)
-
-# 	volume_all = vtk.vtkVolume()
-# 	volume_all.SetMapper(volumeMapper_all)
-# 	volume_all.SetProperty(propVolume_all)
-# 	return volume_all
-
-
 def save_screeenshot(rw,filename):
 	windowToImageFilter = vtk.vtkWindowToImageFilter()
 	windowToImageFilter.SetInput(rw)
@@ -468,15 +409,6 @@ def setup_camera(orientation,renderer):
 		camera =  renderer.GetActiveCamera()
 		focus = camera.GetFocalPoint()
 		d = camera.GetDistance()
-
-		# spacing = [1,1,1]
-		# extent = renderer.ComputeVisiblePropBounds()
-		# imageHeight = (extent[3] - extent[2] + 1.0) * spacing[1]
-		# viewAngleRadians = vtk.vtkMath.RadiansFromDegrees (camera.GetViewAngle())
-		# distance = imageHeight / viewAngleRadians
-		# print(viewAngleRadians)
-		# camera.SetPosition(focus[0],focus[1],distance)
-		# camera.SetPosition(0.5)
 
 		distance = camera.GetDistance()
 		newdis = 0.7 * distance
@@ -571,9 +503,6 @@ def setup_vtk_pipeline(roi,allz_num,out):
 
 	list_filenames,need2relabel = generate_data_for_visualization(relabelMap,roi,allz_num,out)
 
-	# generate_slice_view(list_filenames['all_filenameSegmentation'],relabelMap,need2relabel)
-	# exit()
-	# print(list_renderers.keys())
 	colors = vtk.vtkNamedColors()
 	# One render window, multiple viewports.
 	rw = vtk.vtkRenderWindow()
@@ -667,17 +596,9 @@ def setup_vtk_pipeline(roi,allz_num,out):
 			add_scalarbar(ren)
 			# pass
 				
-
-	# 	#setup camera for render
-		# if(viewport_keys[i] == title_bottom_row_from_left_1):
-			
-	# elif
-
-	#setup camera orientation on renderers
-
 	rw.Render()
-	rw.SetWindowName('MultipleViewPorts')
-	# rw.SetSize(600, 600)
+	rw.SetWindowName('Report Views')
+	rw.SetSize(1280, 720)
 
 	save_screeenshot(rw,"all.png")
 
@@ -809,12 +730,14 @@ def _main( roi, allz_num, pdf_path):
 
 if __name__ == '__main__':
 	# print(599)
-	roi = '/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/relabel/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607.nii.gz'
+	#roi = '/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/relabel/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607.nii.gz'
+	roi = 'D:\\ashish\\work\\projects\\KaapanaStuff\\data\\brainvis_error\\F2\\2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607\\relabel\\2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607.nii.gz'
 	input = readimage(roi)
-	output = write_image(input,'/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/relabel/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607.nrrd')
+	#output = write_image(input,'/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/relabel/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607.nrrd')
+	output = write_image(input,'D:\\ashish\\work\\projects\\KaapanaStuff\\data\\brainvis_error\\F2\\2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607\\relabel\\2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607.nrrd')
 	# print(603)
-	roi_file = '/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/relabel/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607.nrrd'
-	with open('/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/roi-quantification/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607_allz_num.pkl','rb') as f:
+	roi_file = 'D:\\ashish\\work\\projects\\KaapanaStuff\\data\\brainvis_error\\F2\\2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607\\relabel\\2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607.nrrd'
+	with open('D:\\ashish\\work\\projects\\KaapanaStuff\\data\\brainvis_error\\F2\\2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607\\roi-quantification\\2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607_allz_num.pkl','rb') as f:
 		allz_num = pickle.load(f)
 	pdf_path = './test.pdf'
 	_main( roi_file, allz_num, pdf_path)
