@@ -15,17 +15,17 @@ from multiprocessing.pool import ThreadPool
 from subprocess import PIPE, run
 
 ## For local testng
-os.environ["WORKFLOW_DIR"] = "/sharedFolder/nnu1-230609055148242424" #"<your data directory>"
-os.environ["BATCH_NAME"] = "batch"
-os.environ["OPERATOR_IN_DIR"] = "T1_to_nii"
-os.environ["OPERATOR_OUT_DIR"] = "output"
-os.environ["AWS_CREDENTIAL_FILE_PATH"] = "/sharedFolder/credentials"
-os.environ["AWS_CONFIG_FILE_PATH"] = str(None)
-os.environ["AWS_ACCESS_KEY"] = str(None)
-os.environ["AWS_SECRET_KEY"] = str(None)
-os.environ["S3_BUCKET_NAME"] = "from-kaapana"
-os.environ['S3_OBJECT_NAME']= "subject21_0000_0000.nii.gz"
-os.environ["S3_ACTION"] = 'put'
+# os.environ["WORKFLOW_DIR"] = "/sharedFolder/nnu1-230609055148242424" #"<your data directory>"
+# os.environ["BATCH_NAME"] = "batch"
+# os.environ["OPERATOR_IN_DIR"] = "T1_to_nii"
+# os.environ["OPERATOR_OUT_DIR"] = "output"
+# os.environ["AWS_CREDENTIAL_FILE_PATH"] = "/sharedFolder/credentials"
+# os.environ["AWS_CONFIG_FILE_PATH"] = str(None)
+# os.environ["AWS_ACCESS_KEY"] = str(None)
+# os.environ["AWS_SECRET_KEY"] = str(None)
+# os.environ["S3_BUCKET_NAME"] = "from-kaapana"
+# os.environ['S3_OBJECT_NAME']= "subject21_0000_0000.nii.gz"
+# os.environ["S3_ACTION"] = 'put'
 
 execution_timeout = 300
 
