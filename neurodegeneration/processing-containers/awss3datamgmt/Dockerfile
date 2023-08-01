@@ -1,7 +1,7 @@
 FROM python:3.9-slim
 
 LABEL IMAGE="AWS-S3-Data-Mgmt"
-LABEL VERSION="0.1.1"
+LABEL VERSION="0.1.3"
 LABEL CI_IGNORE="True"
 
 RUN pip install --upgrade pip
