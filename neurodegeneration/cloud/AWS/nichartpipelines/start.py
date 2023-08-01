@@ -7,13 +7,21 @@ import boto3
 import shutil
 
 #for testing
-# os.environ["AWS_BATCH_JOB_ID"] = "A" #auto populated
-# os.environ["JOB_INPUT_BUCKET"] = "from-kaapana"
-# os.environ["JOB_INPUT_KEY"] = "Lifespan_0000_0000.nii.gz"
-# os.environ["JOB_REQUESTED_BY_USER"] = "kaapana"
-# os.environ['AWS_BATCH_JQ_NAME'] = "C" #auto populated
-# os.environ['AWS_BATCH_CE_NAME'] = "D" #auto populated
-# os.environ["AWS_SHARED_CREDENTIALS_FILE"] = "/sharedFolder/credentials"
+#os.environ["AWS_BATCH_JOB_ID"] = "A" #auto populated
+#os.environ["JOB_INPUT_BUCKET"] = "from-kaapana"
+#os.environ["JOB_INPUT_KEY"] = "Subject1_0000_0000.nii.gz"
+#os.environ["JOB_REQUESTED_BY_USER"] = "kaapana"
+#os.environ['AWS_BATCH_JQ_NAME'] = "C" #auto populated
+#os.environ['AWS_BATCH_CE_NAME'] = "D" #auto populated
+#os.environ["AWS_SHARED_CREDENTIALS_FILE"] = "/sharedFolder/credentials"
+
+def get_seriesuid(bucket_name,object_key):
+  s3 = boto3.client('s3')
+  object_metadata = s3.head_object(Bucket=bucket_name, Key=object_key)['Metadata']
+  seriesuid = object_metadata['seriesuid']
+  print("series uid = ", seriesuid)
+  return seriesuid
+  
 
 def runProcessing():
     print("Starting nnunet pipeline[dlicv->apply mask->muse->relabel]")
@@ -60,10 +68,13 @@ s3 = boto3.client('s3')
 os.makedirs("/input/", exist_ok=True)
 os.makedirs("/output/", exist_ok=True)
 
+downloaded_file = "/input/" + input_key
+
+uid = get_seriesuid(input_bucket,input_key)
 # Download input file(s) from S3 and place in input
 # Placeholder while we figure out more complex batch-subject management
 try:
-    with open("/input/Subject1_0000_0000.nii.gz", 'wb') as f:
+    with open(downloaded_file, 'wb') as f:
         s3.download_fileobj(input_bucket, input_key, f)
     #response = s3.get_object(Bucket=input_bucket, Key=input_key)
     #print("CONTENT TYPE: " + response['ContentType'])
@@ -89,19 +100,22 @@ print("Sending to S3...")
 
 out_bucket = "to-kaapana"
 #object_name = os.path.join("/private/", requestedByUser, job_id +".zip").lstrip('/')
-object_name = "Subject1_0000.nii.gz"
+basename = os.path.basename(input_key).split('_0000_0000.nii.gz',1)[0]
+#object_name = "Subject1_0000.nii.gz"
+object_name = basename + '_0000.nii.gz'
 file_to_upload = os.path.join("/output/relabeled_out",object_name)
 
-print("Uploading file")
+s3_upload = boto3.client('s3')
+print("Uploading file: ", file_to_upload)
 try:
-    response = s3.upload_file(
-        file_to_upload, out_bucket,object_name,
-        ExtraArgs={'Metadata': {'PlaceholderKey': 'PlaceholderValue'}}
+    response = s3_upload.upload_file(
+        file_to_upload, out_bucket,input_key,
+        ExtraArgs={'Metadata': {'seriesuid': uid}}
     )
 except Exception as e:
     print(e)
-    print('Error uploading object {} from bucket {}. Make sure they exist and your bucket is in the same region as this function.'.format(object_name, out_bucket))
+    print('Error uploading object {} from bucket {}. Make sure they exist and your bucket is in the same region as this function.'.format(input_key, out_bucket))
     raise e
-print("Object should be available in bucket " + out_bucket + " with object key " + object_name)
+print("Object should be available in bucket " + out_bucket + " with object key " + input_key)
 print("Done.")
 
