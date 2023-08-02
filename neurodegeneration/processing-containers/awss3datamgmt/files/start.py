@@ -5,6 +5,7 @@ from glob import glob
 from pathlib import Path
 import shutil
 import SimpleITK as sitk
+import uuid
 import boto3
 from botocore.exceptions import ClientError
 
@@ -263,7 +264,8 @@ for batch_element_dir in batch_folders:
     input_files = glob(join(element_input_dir, input_file_extension), recursive=True)
     print(f"# Found {len(input_files)} input-files!")
 
-    s3_object_name = s3_object_name_prefix +  str(processed_count+1) + "_0000_0000.nii.gz"
+    # add a uuid to prefix to generate unique name
+    s3_object_name = s3_object_name_prefix +  uuid.uuid4().hex + str(processed_count+1) + "_0000_0000.nii.gz"
     print('s3 object name: ', s3_object_name)
     # Single process:
     # Loop for every input-file found with extension 'input_file_extension'
