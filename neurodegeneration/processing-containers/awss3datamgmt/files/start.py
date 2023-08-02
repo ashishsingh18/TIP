@@ -5,6 +5,7 @@ from glob import glob
 from pathlib import Path
 import shutil
 import SimpleITK as sitk
+import uuid
 import boto3
 from botocore.exceptions import ClientError
 
@@ -15,18 +16,19 @@ from multiprocessing.pool import ThreadPool
 from subprocess import PIPE, run
 
 ## For local testng
-#os.environ["WORKFLOW_DIR"] = "/sharedFolder/nnu1-230609055148242424" #"<your data directory>"
-#os.environ["BATCH_NAME"] = "batch"
-#os.environ["OPERATOR_IN_DIR"] = "T1_to_nii"
-#os.environ["OPERATOR_OUT_DIR"] = "output"
-#os.environ["AWS_CREDENTIAL_FILE_PATH"] = "/sharedFolder/credentials"
-#os.environ["AWS_CONFIG_FILE_PATH"] = str(None)
-#os.environ["AWS_ACCESS_KEY"] = str(None)
-#os.environ["AWS_SECRET_KEY"] = str(None)
-#os.environ["S3_BUCKET_NAME"] = "from-kaapana"
-#os.environ['S3_OBJECT_NAME_PREFIX']= "*.*"
-#os.environ["S3_ACTION"] = 'remove'
-#os.environ["S3_OBJECT_SERIES_UID"] = "2.16.840.1.114362.1.12066432.24920037488.604832115.605.168"
+# os.environ["WORKFLOW_DIR"] = "/sharedFolder/nnu1-230609055148242424" #"<your data directory>"
+# os.environ["BATCH_NAME"] = "batch"
+# os.environ["OPERATOR_IN_DIR"] = "T1_to_nii"
+# os.environ["OPERATOR_OUT_DIR"] = "output"
+# os.environ["AWS_CREDENTIAL_FILE_PATH"] = "/sharedFolder/credentials"
+# os.environ["AWS_CONFIG_FILE_PATH"] = str(None)
+# os.environ["AWS_ACCESS_KEY"] = str(None)
+# os.environ["AWS_SECRET_KEY"] = str(None)
+# os.environ["S3_BUCKET_NAME"] = "from-kaapana"
+# os.environ['S3_OBJECT_NAME_PREFIX']= "T1/S"
+# os.environ["S3_ACTION"] = 'put'
+# os.environ["S3_OBJECT_SERIES_UID"] = "2.16.840.1.114362.1.12066432.24920037488.604832115.605.168"
+# os.environ["S3_OBJECT_SERIES_DESCRIPTION"] = "T1"
 
 execution_timeout = 300
 
@@ -41,6 +43,7 @@ s3_bucket_name=os.environ["S3_BUCKET_NAME"]
 s3_object_name_prefix = os.environ['S3_OBJECT_NAME_PREFIX']
 s3_action=os.environ["S3_ACTION"]
 #seruid = os.environ["S3_OBJECT_SERIES_UID"]
+series_description = os.environ["S3_OBJECT_SERIES_DESCRIPTION"]
 
 # set aws specific env variables if specified by user
 if(aws_access_key != 'None'):
@@ -151,7 +154,7 @@ def upload_file(file_name, bucket, uid,object_name=None):
     # Upload the file
     s3_client = boto3.client('s3')
     try:
-        response = s3_client.upload_file(file_name, bucket, object_name,ExtraArgs={'Metadata': {'seriesuid': uid}})
+        response = s3_client.upload_file(file_name, bucket, object_name,ExtraArgs={'Metadata': {'seriesuid': uid,'seriesdescription':series_description}})
     except ClientError as e:
         print(e)
         return False
@@ -263,7 +266,8 @@ for batch_element_dir in batch_folders:
     input_files = glob(join(element_input_dir, input_file_extension), recursive=True)
     print(f"# Found {len(input_files)} input-files!")
 
-    s3_object_name = s3_object_name_prefix +  str(processed_count+1) + "_0000_0000.nii.gz"
+    # add a uuid to prefix to generate unique name
+    s3_object_name = s3_object_name_prefix +  uuid.uuid4().hex + str(processed_count+1) + "_0000_0000.nii.gz"
     print('s3 object name: ', s3_object_name)
     # Single process:
     # Loop for every input-file found with extension 'input_file_extension'
