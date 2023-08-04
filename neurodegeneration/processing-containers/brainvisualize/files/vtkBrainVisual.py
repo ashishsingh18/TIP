@@ -87,7 +87,7 @@ def hex_to_rgb(hex: str):
 
 def add_scalarbar(renderer):
  
-	image_path = '../refs/output.png'
+	image_path = '/refs/colorbar.png'
 	image_reader = vtk.vtkPNGReader()
 	image_reader.SetFileName(image_path)
 	image_reader.Update()
@@ -98,6 +98,11 @@ def add_scalarbar(renderer):
 	image_actor.SetInputData(image_data)
 
 	renderer.AddActor(image_actor)
+ 
+	renderer.ResetCamera()
+	camera =  renderer.GetActiveCamera()
+	camera.OrthogonalizeViewUp()
+	renderer.ResetCameraClippingRange()	
 
 
 def get_color_TF(relabelMap,need2relabel):
@@ -296,7 +301,6 @@ def setup_camera(orientation,renderer):
 		camera.SetPosition(focus[0],focus[1],focus[2]+newdis)
 		camera.SetPosition(541.09,15.13,-4.41)
 		#camera.SetPosition(focus[0],focus[1]+newdis,focus[2])
-		
 
 		camera.SetFocalPoint(focus)
 		camera.SetViewUp(0,0,1)
@@ -353,6 +357,8 @@ def setup_vtk_pipeline(roi,allz_num,out):
 	iren = vtk.vtkRenderWindowInteractor()
 	iren.SetRenderWindow(rw)
 
+	rw.SetOffScreenRendering(1)
+ 
 	# Define 8 viewports
 	viewport_positions = {}
 	viewport_positions[ORIENTATION.BOTTOM] = [0, 0, 0.25, 0.5]
@@ -419,11 +425,6 @@ def setup_vtk_pipeline(roi,allz_num,out):
 			setup_camera(viewport_keys[i],ren)
 		elif(viewport_keys[i] == ORIENTATION.COLORBAR): #bottom row, last renderer for colorbar
 			add_scalarbar(ren)
-			ren.ResetCamera()
-			camera =  ren.GetActiveCamera()
-			camera.OrthogonalizeViewUp()
-			ren.ResetCameraClippingRange()	
-			#render_scalarbar(relabelMap,need2relabel)
 				
 	rw.Render()
 	rw.SetWindowName('Report Views')
@@ -484,19 +485,9 @@ def _main( roi, allz_num, pdf_path):
 	out = out + '/' + UID
 	setup_vtk_pipeline(roi,allz_num,out)
 
-if __name__ == '__main__':
-	# roi = '/home/diwu/Desktop/kaapana-data-to-check-brainviz/F7/2.16.840.1.114362.1.12066432.24920037488.604832617.475.5969/relabel/2.16.840.1.114362.1.12066432.24920037488.604832617.475.5969.nii.gz'
-	# input = read_itk_image(roi)
-	# output = write_itk_image(input,'/home/diwu/Desktop/kaapana-data-to-check-brainviz/F7/2.16.840.1.114362.1.12066432.24920037488.604832617.475.5969/relabel/2.16.840.1.114362.1.12066432.24920037488.604832617.475.5969.nrrd')
-	# roi_file = '/home/diwu/Desktop/kaapana-data-to-check-brainviz/F1/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168/relabel/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168.nrrd'
-	# with open('/home/diwu/Desktop/kaapana-data-to-check-brainviz/F1/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168/roi-quantification/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168_allz_num.pkl','rb') as f:
-	# 	allz_num = pickle.load(f)
-	# pdf_path = './test.pdf'
-	# _main( roi_file, allz_num, pdf_path)
-
-	# F2
-	roi_file = '/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/relabel/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607.nii.gz'
-	with open('/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/roi-quantification/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607_allz_num.pkl','rb') as f:
-		allz_num = pickle.load(f)
-	pdf_path = './test.pdf'
-	_main( roi_file, allz_num, pdf_path)
+# if __name__ == '__main__':
+# 	roi_file = '/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/relabel/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607.nii.gz'
+# 	with open('/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/roi-quantification/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607_allz_num.pkl','rb') as f:
+# 		allz_num = pickle.load(f)
+# 	pdf_path = './test.pdf'
+# 	_main( roi_file, allz_num, pdf_path)
