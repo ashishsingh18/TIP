@@ -6,13 +6,13 @@ import boto3
 import shutil
 
 #for testing
-os.environ["AWS_BATCH_JOB_ID"] = "A" #auto populated
-os.environ["JOB_INPUT_BUCKET"] = "to-kaapana"
-os.environ["JOB_INPUT_KEY"] = "F2.nii.gz"
-os.environ["JOB_REQUESTED_BY_USER"] = "kaapana"
-os.environ['AWS_BATCH_JQ_NAME'] = "C" #auto populated
-os.environ['AWS_BATCH_CE_NAME'] = "D" #auto populated
-os.environ["AWS_SHARED_CREDENTIALS_FILE"] = "/sharedFolder/credentials"
+# os.environ["AWS_BATCH_JOB_ID"] = "A" #auto populated
+# os.environ["JOB_INPUT_BUCKET"] = "to-kaapana"
+# os.environ["JOB_INPUT_KEY"] = "F2.nii.gz"
+# os.environ["JOB_REQUESTED_BY_USER"] = "kaapana"
+# os.environ['AWS_BATCH_JQ_NAME'] = "C" #auto populated
+# os.environ['AWS_BATCH_CE_NAME'] = "D" #auto populated
+# os.environ["AWS_SHARED_CREDENTIALS_FILE"] = "/sharedFolder/credentials"
 
 def get_seriesuid(bucket_name,object_key):
   s3 = boto3.client('s3')
