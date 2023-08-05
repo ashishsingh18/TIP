@@ -7,8 +7,8 @@ import shutil
 
 #for testing
 # os.environ["AWS_BATCH_JOB_ID"] = "A" #auto populated
-# os.environ["JOB_INPUT_BUCKET"] = "to-kaapana"
-# os.environ["JOB_INPUT_KEY"] = "F2.nii.gz"
+# os.environ["JOB_INPUT_BUCKET"] = "from-kaapana"
+# os.environ["JOB_INPUT_KEY"] = "Flair/Subjectb56683ff6bc14e5fbc86c22d9ae35c251_0000_0000.nii.gz"
 # os.environ["JOB_REQUESTED_BY_USER"] = "kaapana"
 # os.environ['AWS_BATCH_JQ_NAME'] = "C" #auto populated
 # os.environ['AWS_BATCH_CE_NAME'] = "D" #auto populated
@@ -18,9 +18,10 @@ def get_seriesuid(bucket_name,object_key):
   s3 = boto3.client('s3')
   object_metadata = s3.head_object(Bucket=bucket_name, Key=object_key)['Metadata']
   seriesuid = object_metadata['seriesuid']
+  series_description = object_metadata['seriesdescription']
   print("series uid = ", seriesuid)
-  return seriesuid
-  
+  print(" series description = ", series_description)
+  return seriesuid,series_description
 
 def runProcessing():
     print("Starting deepmrseg based wmls")
@@ -93,12 +94,12 @@ if not input_bucket or not input_key:
 #boto3 code
 s3 = boto3.client('s3')
 
-os.makedirs("/input/", exist_ok=True)
+os.makedirs("/input/Flair/", exist_ok=True)
 os.makedirs("/output/", exist_ok=True)
 
 downloaded_file = "/input/" + input_key
 
-uid = get_seriesuid(input_bucket,input_key)
+seriesuid,series_description = get_seriesuid(input_bucket,input_key)
 # Download input file(s) from S3 and place in input
 # Placeholder while we figure out more complex batch-subject management
 try:
@@ -139,7 +140,7 @@ print("Uploading file: ", file_to_upload)
 try:
     response = s3_upload.upload_file(
         file_to_upload[0], out_bucket,input_key,
-        ExtraArgs={'Metadata': {'seriesuid': uid}}
+        ExtraArgs={'Metadata': {'seriesuid': seriesuid,'seriesdescription':series_description}}
     )
 except Exception as e:
     print(e)
