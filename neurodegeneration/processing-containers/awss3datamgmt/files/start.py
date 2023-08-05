@@ -96,6 +96,7 @@ def get_seriesuid(bucket_name,object_key):
   object_metadata = s3.head_object(Bucket=bucket_name, Key=object_key)['Metadata']
   seriesuid = object_metadata['seriesuid']
   print("series uid = ", seriesuid)
+  return seriesuid
 
 #retrieve metadata
 def retrieve_metadata(bucket_name, seruid):
