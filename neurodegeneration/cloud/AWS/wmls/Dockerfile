@@ -24,9 +24,10 @@ RUN git clone  https://github.com/CBICA/DeepMRSeg.git /DeepMRSeg-package
 
 RUN cd /DeepMRSeg-package && python setup.py install
 
-#aws installation, here we also bundle the model inside the container
+#aws installation
 RUN pip install boto3
 
+#we also bundle the model inside the container
 COPY ./models /models
 COPY ./start.py /start.py
 

@@ -14,7 +14,7 @@ import shutil
 # os.environ['AWS_BATCH_CE_NAME'] = "D" #auto populated
 # os.environ["AWS_SHARED_CREDENTIALS_FILE"] = "/sharedFolder/credentials"
 
-def get_seriesuid(bucket_name,object_key):
+def get_metadata(bucket_name,object_key):
   s3 = boto3.client('s3')
   object_metadata = s3.head_object(Bucket=bucket_name, Key=object_key)['Metadata']
   seriesuid = object_metadata['seriesuid']
@@ -99,7 +99,7 @@ os.makedirs("/output/", exist_ok=True)
 
 downloaded_file = "/input/" + input_key
 
-seriesuid,series_description = get_seriesuid(input_bucket,input_key)
+seriesuid,series_description = get_metadata(input_bucket,input_key)
 # Download input file(s) from S3 and place in input
 # Placeholder while we figure out more complex batch-subject management
 try:
@@ -135,6 +135,7 @@ object_name = basename + '_0000.nii.gz'
 #file_to_upload = os.path.join("/output/relabeled_out",object_name)
 file_to_upload = glob.glob(output_dir + '/*.nii.gz')
 
+#for now keep the output name same as the input
 s3_upload = boto3.client('s3')
 print("Uploading file: ", file_to_upload)
 try:
