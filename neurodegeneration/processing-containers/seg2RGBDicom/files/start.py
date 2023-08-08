@@ -6,17 +6,18 @@ from datetime import datetime
 import numpy as np
 
 # For local testng
-#os.environ["WORKFLOW_DIR"] = "D:/ashish/work/projects/Kaapana/sampledata/dcm2nifti-210519201059552217" #"<your data directory>"
-#os.environ["BATCH_NAME"] = "batch"
-#os.environ["OPERATOR_IN_DIR"] = "dcm-converter"
-#os.environ["OPERATOR_OUT_DIR"] = "output"
-#os.environ["OPERATOR_IN_MASK_DIR"] = "muse_roi_subset_creator"
-#os.environ["OPERATOR_IN_DCM_JSON_DIR"] = "dcm2json"
-#os.environ["OPERATOR_IN_REFERENCE_IMAGE_DIR"] = "None"
-#os.environ["OPERATOR_IN_REFERENCE_IMAGE_DIR"] = "None"
-#os.environ["SERIES_DESC"] = "None"
-#os.environ["MODALITY"] = "None"
-#os.environ["SERIES_NUM"] = "None"
+# os.environ["WORKFLOW_DIR"] = "/sharedFolder/F1" #"<your data directory>"
+# os.environ["BATCH_NAME"] = "batch"
+# os.environ["OPERATOR_IN_DIR"] = "None"
+# os.environ["OPERATOR_OUT_DIR"] = "output"
+# os.environ["OPERATOR_IN_MASK_DIR"] = "wmls"
+# os.environ["OPERATOR_IN_DCM_JSON_DIR"] = "GetFlairMetadata"
+# os.environ["OPERATOR_IN_REFERENCE_IMAGE_DIR"] = "Flair_to_nii"
+# os.environ["SERIES_DESC"] = "overlay"
+# os.environ["MODALITY"] = "MR"
+# os.environ["SERIES_NUM"] = "901"
+# os.environ["OPACITY"] = "0.5"
+# os.environ["COLOR_SCHEME"] = "/sharedFolder/colors/wmls_color_scheme.csv"
 
 user_specified_modality = os.environ["MODALITY"]
 user_specified_series_number = os.environ["SERIES_NUM"] #Default Series Number: 901
@@ -78,26 +79,71 @@ def get_dicom_tags_from_json(dcm_json_file):
     with open(dcm_json_file, 'r') as json_file:
         data = json.load(json_file)
 
-        #patient specific tags
-        patient_id = [value for key, value in data.items() if 'PatientID' in key][0]
-        patient_name = [value for key, value in data.items() if 'PatientName' in key][0]
-        patient_sex = [value for key, value in data.items() if 'PatientSex' in key][0]
+        print("reading dicom metadata from json")
+        tags_to_copy = []
+
+        # identify relevant tags from the original meta-data dictionary of input image
+        ####patient specific tags########
+        patient_id = next((value for key, value in data.items() if 'PatientID' in key),None)
+        print("patient id: ", patient_id)
+        if(patient_id != None):
+            tags_to_copy.append(("0010|0020", patient_id))# Patient ID
+
+        patient_name = next((value for key, value in data.items() if 'PatientName' in key),None)
+        print("patient name: ", patient_name)
+        if(patient_name != None):
+            tags_to_copy.append(("0010|0010", patient_name))# Patient Name
+
+        patient_sex = next((value for key, value in data.items() if 'PatientSex' in key),None)
+        print("patient sex: ", patient_sex)
+        if(patient_sex != None):
+            tags_to_copy.append(("0010|0040", patient_sex))# Patient Sex
+
         patient_age = [value for key, value in data.items() if 'PatientAge' in key][0]
-        patient_size = [value for key, value in data.items() if 'PatientSize' in key][0]
-        patient_wt = [value for key, value in data.items() if 'PatientWeight' in key][0]
+        print("patient age: ", patient_age)
+        if(patient_age != None):
+            tags_to_copy.append(("0010|1010", patient_age))# Patient age
 
-        #study specific tags
-        study_uid = [value for key, value in data.items() if 'StudyInstanceUID' in key][0]
-        study_id = [value for key, value in data.items() if 'StudyID' in key][0]
-        study_date = [value for key, value in data.items() if 'StudyDate' in key][0]
-        study_time = [value for key, value in data.items() if 'StudyTime' in key][0]
+        patient_size = next((value for key, value in data.items() if 'PatientSize' in key),None)
+        print("patient size: ", patient_size)
+        if(patient_size != None):
+            tags_to_copy.append(("0010|1020", patient_size))# Patient size
 
-        #other tags
+        patient_wt = next((value for key, value in data.items() if 'PatientWeight' in key),None)
+        print("patient wt: ", patient_wt)
+        if(patient_wt != None):
+            tags_to_copy.append(("0010|1030", patient_wt))# Patient wt
+
+        #####study specific tags#####
+        study_uid = next((value for key, value in data.items() if 'StudyInstanceUID' in key),None)
+        print("study uid ", study_uid)
+        if(study_uid != None):
+            tags_to_copy.append(("0020|000D", study_uid))# Study Instance UID, for machine consumption
+
+        study_id = next((value for key, value in data.items() if 'StudyID' in key),None)
+        print("study id ", study_id)
+        if(study_id != None):
+            tags_to_copy.append(("0020|0010", study_id))# Study ID, for human consumption
+
+        study_date = next((value for key, value in data.items() if 'StudyDate' in key),None)
+        print("study date ", study_date)
+        if(study_date != None):
+            tags_to_copy.append(("0008|0020", study_date))# Study Date
+
+        study_time = next((value for key, value in data.items() if 'StudyTime' in key),None)
+        print("study time ", study_time)
+        if(study_time != None):
+            tags_to_copy.append(("0008|0030", study_time))# Study Time
+
+        #####other tags####
         #use modality specified by user(think multi-modality pipeline) otherwise use the one from reference image
         if(user_specified_modality == "None"):
-            modality = [value for key, value in data.items() if 'Modality' in key][0]
+            modality = next((value for key, value in data.items() if 'Modality' in key),None)
         else:
             modality = user_specified_modality
+        print("modality ", modality)
+        if(study_time != None):
+            tags_to_copy.append(("0008|0060", modality))  # Modality
 
         #accession number
         possible_accession_number_values = [value for key, value in data.items() if 'AccessionNumber' in key]
@@ -114,20 +160,7 @@ def get_dicom_tags_from_json(dcm_json_file):
             accession_number_found = True
             accession_number = possible_accession_number_values[0]
 
-        #print('accession_number: ', accession_number)
-
-        # Copy relevant tags from the original meta-data dictionary
-        tags_to_copy = [("0010|0010", patient_name),# Patient Name
-                        ("0010|0020", patient_id),# Patient ID
-                        ("0010|0040", patient_sex),# Patient Sex
-                        ("0010|1010", patient_age),# Patient age
-                        ("0010|1020", patient_size),# Patient size
-                        ("0010|1030", patient_wt),# Patient wt
-                        ("0020|000D", study_uid),# Study Instance UID, for machine consumption
-                        ("0020|0010", study_id),# Study ID, for human consumption
-                        ("0008|0020", study_date),# Study Date
-                        ("0008|0030", study_time),# Study Time
-                        ("0008|0060", modality)]  # Modality
+        # print('accession_number: ', accession_number)
 
         if(accession_number_found):
             tags_to_copy.append(("0008|0050", accession_number)) #AccessionNumber
@@ -157,30 +190,33 @@ def write_dicom_slices(outdir, tags_to_write, new_img, i):
     writer.Execute(image_slice)
 
 batch_folders = [f for f in glob.glob(os.path.join('/', os.environ['WORKFLOW_DIR'], os.environ['BATCH_NAME'], '*'))]
-#print('batch_folders: ',batch_folders)
+print('batch_folders: ',batch_folders)
 
 for batch_element_dir in batch_folders:
 
     if "None" not in os.environ["OPERATOR_IN_REFERENCE_IMAGE_DIR"]:
         print("Reference image folder provided")
         ref_image_input_dir = os.path.join(batch_element_dir, os.environ['OPERATOR_IN_REFERENCE_IMAGE_DIR'])
-        ref_image_file = sorted(glob.glob(os.path.join(ref_image_input_dir, "*.nii.gz*"), recursive=True))
+        ref_image_file = sorted(glob.glob(os.path.join(ref_image_input_dir, "*.nii.gz"), recursive=True)) or sorted(glob.glob(os.path.join(ref_image_input_dir, "*.nrrd"), recursive=True))
+        print(ref_image_file)
 
     if "None" not in os.environ["OPERATOR_IN_MASK_DIR"]:
         print("mask image folder provided")
         mask_image_input_dir = os.path.join(batch_element_dir, os.environ['OPERATOR_IN_MASK_DIR'])
-        mask_image_file = sorted(glob.glob(os.path.join(mask_image_input_dir, "*.nrrd*"), recursive=True))
+        mask_image_file = sorted(glob.glob(os.path.join(mask_image_input_dir, "*.nrrd"), recursive=True)) or sorted(glob.glob(os.path.join(mask_image_input_dir, "*.nii.gz"), recursive=True))
+        print(mask_image_file)
 
     if "None" not in os.environ["OPERATOR_IN_DCM_JSON_DIR"]:
         print("Dicom json(metadata) folder provided")
         dcm_json_input_dir = os.path.join(batch_element_dir, os.environ['OPERATOR_IN_DCM_JSON_DIR'])
         dcm_json_file = sorted(glob.glob(os.path.join(dcm_json_input_dir, "*.json*"), recursive=True))
+        print(dcm_json_file)
 
     if len(ref_image_file) == 0 and len(mask_image_file) == 0 and len(dcm_json_file) == 0 and len(user_specified_color_scheme) == 0:
         print("reference image, mask image, dicom json file or color scheme csv file not found!")
         exit(1)
     else:
-        print("Starting creation of dicom seg overlay: %s" % ref_image_file)
+        print(f"Starting creation of dicom seg overlay for reference image {ref_image_file} with mask {mask_image_file} and json {dcm_json_file}")
 
         image = readimage(ref_image_file[0])
         print("input reference image read")
