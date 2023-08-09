@@ -20,7 +20,7 @@ def WMHbox(fname):
 	I1.line((1451,12, 1938,12), width=2, fill=128)
 	I1.line((1938,12, 1938,467), width=2, fill=128)
 
-	myFont = ImageFont.truetype("refs/Times New Roman Bold.ttf", 14)
+	myFont = ImageFont.truetype("../refs/Times New Roman Bold.ttf", 14)
 
 	# Write 'Unharmonized values' in lower left of the box
 	I1.text((1454,450), "Unharmonized population values", font = myFont, fill=128)
