@@ -156,6 +156,11 @@ def createSpareBAplot(spareBA, dfSub, dfRef, fig, row, shownCNsubjs, shownADsubj
 	setmax = max([XX90_CN[CN_up5.index(min(CN_up5))],XX90_CN[CN_down5.index(min(CN_down5))],XX90_AD[AD_up5.index(min(AD_up5))],XX90_AD[AD_down5.index(min(AD_down5))],ADRef['SPARE_BA'].tolist()[0],CNRef['SPARE_BA'].tolist()[0]])
 	setmin = min([XX10_CN[CN_up5.index(min(CN_up5))],XX10_CN[CN_down5.index(min(CN_down5))],XX10_AD[AD_up5.index(min(AD_up5))],XX10_AD[AD_down5.index(min(AD_down5))],ADRef['SPARE_BA'].tolist()[0],CNRef['SPARE_BA'].tolist()[0]])
 	spacer = (setmax - setmin)*.4
+ 
+	## spareBA score too high to be showed
+	setmax = max(setmax, spareBA)
+	setmin = min(setmin, spareBA)
+ 
 	setmax = setmax + spacer
 	setmin = setmin - spacer
 

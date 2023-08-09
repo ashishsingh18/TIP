@@ -18,8 +18,9 @@ COPY files/reportdriver_generateBrainVisual.py /src
 COPY files/generateBrainVisual.py /src
 COPY files/createcmap.py /src
 
-RUN mkdir /refs
+COPY files/vtkBrainVisual.py /src
 
+RUN mkdir /refs
 COPY refs/ /refs
 
 CMD ["python3","-u","src/reportdriver_generateBrainVisual.py"]

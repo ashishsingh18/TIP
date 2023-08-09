@@ -6,6 +6,9 @@ import SimpleITK as sitk
 import sys, glob, csv
 import pickle
 
+# import matplotlib.pyplot as plt
+# from matplotlib.colors import ListedColormap
+
 from enum import Enum
 
 #Standard atrophy buckets(chosen by Ilya)
@@ -51,77 +54,56 @@ def hex_to_rgb(hex: str):
 	rgb = [x/256 for x in rgb]
 	return rgb
 
-def get_lut():
-	#lut
-	min_zscore = -2.326
-	colors = ['#bd0026','#f03b20','#fd8d3c','#fecc5c','#ffffb2']
-	values = [min_zscore-1,min_zscore,-1.881,-1.645,-1.036,-.5244]
-	nvals = len(colors)
-	# print("len: ", nvals)
-	lut = vtk.vtkLookupTable()
-	lut.SetNumberOfTableValues(nvals)
-	lut.SetTableRange(min_zscore-1,-0.5244)	
-	# lut.Build()
-	i = 0
-	for k in colors:
-		rgba = hex_to_rgb(colors[i]) + [1] #[1] for opacity in rgba
-		# print("k: ", k, " rgb: ", rgba)
-		lut.SetTableValue(i,rgba)
-		lut.SetAnnotation(vtk.vtkVariant(i),str(values[i]))
-		#print("k: ", k, " cmlabels: ", cmlabels[0][i])
-		i = i + 1
 
-	#exit()
-	# lut.SetTableValue(0, 1.0, 0.0, 0.0) # red
-	# lut.SetTableValue(1, 0.0, 1.0, 0.0) #blue
-	# lut.SetTableValue(2, 1.0, 1.0, 1.0) # white
-	# lut.SetAnnotation(vtk.vtkVariant(0),str(values[0]))
-	# lut.SetAnnotation(vtk.vtkVariant(1),str(values[1]))
-	# lut.SetAnnotation(vtk.vtkVariant(2),str(values[2]))
+###################### Uncomment this function to generate colorbar ##############################
+# def create_scalarbar_matplotlib():
+#     '''
+#     create a scalarbar with matplotlib 
+#     '''
+#     colors = ['#bd0026', '#f03b20', '#fd8d3c', '#fecc5c', '#ffffb2']
+# 	values = [-np.inf, -2.326, -1.881, -1.645, -1.036, -0.5244]
 
-	# # # lut.SetIndexedLookup(1)
-	lut.IndexedLookupOn()
-	# lut.UseBelowRangeColorOn()
-	# lut.UseAboveRangeColorOn()
-	lut.SetBelowRangeColor(255,255,255,1)
-	lut.SetAboveRangeColor(0,0,0,1)
-	# lut.Build()
-	return lut
+# 	# Create a ListedColormap with custom colors
+# 	cmap = ListedColormap(colors)
+
+# 	# Set up a dummy plot to create the colorbar
+# 	dummy_values = np.linspace(0, 1, len(values))  # Create dummy values to plot the colorbar
+# 	plt.figure(figsize=(8, 6))
+# 	plt.imshow([dummy_values], cmap=cmap, aspect='auto')
+# 	plt.gca().set_visible(False)  # Hide axes
+# 	cbar = plt.colorbar(orientation='vertical', shrink = 0.75)
+
+# 	# Set the custom tick positions and labels for the colorbar
+# 	cbar.set_ticks(dummy_values)
+# 	cbar.set_ticklabels([f'{val:.2f}' if not np.isinf(val) else '-inf' for val in values])
+
+# 	# Set the title for the colorbar
+# 	cbar.ax.set_title('Z-Score', loc='center', pad=20)
+
+# 	# Show the plot with the colorbar
+# 	plt.show()
+
+###############################################################################################
 
 def add_scalarbar(renderer):
-	lut = get_lut()
-	#scalar bar
-	scalarBarActor = vtk.vtkScalarBarActor()
-	scalarBarActor.SetPosition(0.3,0.1)
-	scalarBarActor.SetLookupTable(lut)
-	scalarBarActor.SetTextPositionToPrecedeScalarBar()
-	scalarBarActor.SetNumberOfLabels(lut.GetNumberOfAvailableColors())
-	scalarBarActor.GetLabelTextProperty().ItalicOff()
-	scalarBarActor.GetLabelTextProperty().BoldOff()
-	scalarBarActor.GetLabelTextProperty().ShadowOff()
-	scalarBarActor.GetAnnotationTextProperty().SetFontSize(16)
-	scalarBarActor.GetAnnotationTextProperty().SetColor(vtk.vtkNamedColors().GetColor3d("Black"))
-	scalarBarActor.SetLabelFormat('%.2f')
-	scalarBarActor.SetTitle('Z-Score')
-	scalarBarActor.GetTitleTextProperty().SetColor(vtk.vtkNamedColors().GetColor3d("Black"))
-	scalarBarActor.GetTitleTextProperty().SetFontSize(20)
-	renderer.AddActor(scalarBarActor)	
-	
+ 
+	image_path = '/refs/colorbar.png'
+	image_reader = vtk.vtkPNGReader()
+	image_reader.SetFileName(image_path)
+	image_reader.Update()
 
-def render_scalarbar(relabelMap,need2relabel):
-	rw = vtk.vtkRenderWindow()
-	iren = vtk.vtkRenderWindowInteractor()
-	iren.SetRenderWindow(rw)
-	ren = vtk.vtkRenderer()
-	rw.AddRenderer(ren)
-	ren.SetBackground(0,0,1)
-	add_scalarbar(ren,relabelMap,need2relabel)
+	image_data = image_reader.GetOutput()
 
-	rw.Render()
-	rw.SetWindowName('scalarbar')
-	# rw.SetSize(600, 600)
+	image_actor = vtk.vtkImageActor()
+	image_actor.SetInputData(image_data)
 
-	iren.Start()
+	renderer.AddActor(image_actor)
+ 
+	renderer.ResetCamera()
+	camera =  renderer.GetActiveCamera()
+	camera.OrthogonalizeViewUp()
+	renderer.ResetCameraClippingRange()	
+
 
 def get_color_TF(relabelMap,need2relabel):
 	# # Define color legend #
@@ -149,26 +131,17 @@ def get_color_TF(relabelMap,need2relabel):
 def get_plane_from_mri(muse_labelmap):
 	nda_bg_t = sitk.GetArrayFromImage(muse_labelmap)
 
-	# print('image shape is: ', nda_bg_t.shape)
-
 	bg_t = ((nda_bg_t == 59) | (nda_bg_t == 60) | (nda_bg_t == 23) | (nda_bg_t == 30) | (nda_bg_t == 36) | (nda_bg_t == 37) | (nda_bg_t == 55) | (nda_bg_t == 56) | (nda_bg_t == 57) | (nda_bg_t == 58)).astype(int)
 	# print(bg_t.shape)
 	cnt = np.inf
 	bg_t_slice = 0
-	# for y in range(bg_t.shape[1]):
-	# 	if abs(np.sum(bg_t[:,:y,:]) - np.sum(bg_t[:,y:,:])) < cnt:
-	# 		bg_t_slice = y
-	# 		cnt = abs(np.sum(bg_t[:,:y,:]) - np.sum(bg_t[:,y:,:]))
 
+	## balanced the voxel volumn for both left and right
 	for x in range(bg_t.shape[0]):
 		if abs(np.sum(bg_t[:x,:,:]) - np.sum(bg_t[x:,:,:])) < cnt:
 			bg_t_slice = x
 			cnt = abs(np.sum(bg_t[:x,:,:]) - np.sum(bg_t[x:,:,:]))
 		
-	# Set voxels to 0 above V.O.I
-	# nda_bg_t[:,:bg_t_slice,:] = 0
-	# print('bgt slice: ', bg_t_slice)
-
 	# Get transition point from left to right hemisphere from corpus callosum
 	nda_all = nda_bg_t
 	cc = (nda_all == 95).astype(int)
@@ -180,8 +153,6 @@ def get_plane_from_mri(muse_labelmap):
 		if abs(np.sum(cc[:,:y,:]) - np.sum(cc[:,y:,:])) < cnt:
 			mid_slice = y
 			cnt = abs(np.sum(cc[:,:y,:]) - np.sum(cc[:,y:,:]))
-
-	# print('mid slice: ', mid_slice)
 
 	return bg_t_slice, mid_slice
 
@@ -220,47 +191,27 @@ def get_volume(image,relabelMap,need2relabel,clip, orientation, *args):
 		plane = vtk.vtkPlane()
 		if(orientation == ORIENTATION.RIGHT_HEMISPHERE_MEDIAL):
 
-			# print('left 2', idbs_all.GetCenter())
-
 			plane = vtk.vtkPlane()
 			origin = list(image.GetCenter())
 			origin[1] = mid_slice
-
-			# print('origin', origin)
 			plane.SetOrigin(origin)
 			plane.SetNormal(-1,0,0)
 
-			# plane = vtk.vtkPlane()
-			# plane.SetOrigin(idbs_all.GetCenter()) #[x, y, z]
-			# plane.SetNormal(-1,0,0)
 		elif(orientation == ORIENTATION.LEFT_HEMISPHERE_MEDIAL):
-			# print('left 4', idbs_all.GetCenter())
-
+      
 			plane = vtk.vtkPlane()
 			origin = list(image.GetCenter())
 			origin[1] = mid_slice
-
-			# print('origin', origin)
 			plane.SetOrigin(origin)
 			plane.SetNormal(1,0,0)
-
-			# plane = vtk.vtkPlane()
-			# plane.SetOrigin(idbs_all.GetCenter())
-			# plane.SetNormal(1,0,0)
 		elif(orientation == ORIENTATION.BASAL_GANGLIA_THALAMUS):
-
-			# print('left 3', idbs_all.GetCenter())
 
 			plane = vtk.vtkPlane()
 			origin = list(image.GetCenter())
 			origin[2] = bg_t_slice
-
-			# print('origin', origin)
 			plane.SetOrigin(origin)
 			plane.SetNormal(0,0,-1)
-			# plane = vtk.vtkPlane()
-			# plane.SetOrigin(idbs_all.GetCenter())
-			# plane.SetNormal(0,0,-1)
+
 		#add clipping plane to clip the volume
 		vol_mapper.AddClippingPlane(plane)
 
@@ -350,7 +301,6 @@ def setup_camera(orientation,renderer):
 		camera.SetPosition(focus[0],focus[1],focus[2]+newdis)
 		camera.SetPosition(541.09,15.13,-4.41)
 		#camera.SetPosition(focus[0],focus[1]+newdis,focus[2])
-		
 
 		camera.SetFocalPoint(focus)
 		camera.SetViewUp(0,0,1)
@@ -407,6 +357,8 @@ def setup_vtk_pipeline(roi,allz_num,out):
 	iren = vtk.vtkRenderWindowInteractor()
 	iren.SetRenderWindow(rw)
 
+	rw.SetOffScreenRendering(1)
+ 
 	# Define 8 viewports
 	viewport_positions = {}
 	viewport_positions[ORIENTATION.BOTTOM] = [0, 0, 0.25, 0.5]
@@ -533,10 +485,9 @@ def _main( roi, allz_num, pdf_path):
 	out = out + '/' + UID
 	setup_vtk_pipeline(roi,allz_num,out)
 
-if __name__ == '__main__':
-	muse_roi_file = 'D:\\ashish\\work\\projects\\KaapanaStuff\\data\\brainvis_error\\F2\\2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607\\relabel\\2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607.nii.gz'
-	zscore_file = 'D:\\ashish\\work\\projects\\KaapanaStuff\\data\\brainvis_error\\F2\\2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607\\roi-quantification\\2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607_allz_num.pkl'
-	with open(zscore_file,'rb') as f:
-		allz_num = pickle.load(f)
-	pdf_path = './test.pdf'
-	_main( muse_roi_file, allz_num, pdf_path)
+# if __name__ == '__main__':
+# 	roi_file = '/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/relabel/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607.nii.gz'
+# 	with open('/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/roi-quantification/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607_allz_num.pkl','rb') as f:
+# 		allz_num = pickle.load(f)
+# 	pdf_path = './test.pdf'
+# 	_main( roi_file, allz_num, pdf_path)

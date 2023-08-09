@@ -6,6 +6,8 @@ import nibabel as nib
 from datetime import datetime
 import csv as _csv
 import os as _os
+  
+import SimpleITK as sitk
 
 #### Hardcoded reference data ###
 # Harmonized reference MUSE values #
@@ -414,3 +416,24 @@ def _main(roi, icv, wmls, _json, out_path):
 		pickle.dump(all_MuseROIs_num,pickle_file)
 	with open(_os.path.join(out,UID+'_all_MuseROIs_name.pkl'), 'wb') as pickle_file:
 		pickle.dump(all_MuseROIs_name,pickle_file)
+
+
+####### Local Test ##############
+
+# if __name__ == '__main__':
+    
+#     roi = ['/home/diwu/Desktop/kaapana-data-to-check-brainviz/F1/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168/relabel/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168.nii.gz']
+#     # icv = '/home/diwu/Desktop/kaapana-data-to-check-brainviz/kaapana_Seis/2.16.840.1.114362.1.12035716.24525521429.585200304.999.1428/dlicv-inference/2.16.840.1.114362.1.12035716.24525521429.585200304.999.1428.nrrd'
+#     # wmls = '/home/diwu/Desktop/kaapana-data-to-check-brainviz/kaapana_Seis/2.16.840.1.114362.1.12035716.24525521429.585200304.999.1428/wmls/2.16.840.1.114362.1.12035716.24525521429.585200304.999.1428.nrrd'
+    
+#     # sitk.WriteImage(sitk.ReadImage(icv), '/home/diwu/Desktop/kaapana-data-to-check-brainviz/kaapana_Seis/2.16.840.1.114362.1.12035716.24525521429.585200304.999.1428/dlicv-inference/2.16.840.1.114362.1.12035716.24525521429.585200304.999.1428.nii.gz')
+#     # sitk.WriteImage(sitk.ReadImage(wmls), '/home/diwu/Desktop/kaapana-data-to-check-brainviz/kaapana_Seis/2.16.840.1.114362.1.12035716.24525521429.585200304.999.1428/wmls/2.16.840.1.114362.1.12035716.24525521429.585200304.999.1428.nii.gz')
+    
+#     icv = ['/home/diwu/Desktop/kaapana-data-to-check-brainviz/F1/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168/dlicv-inference/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168.nii.gz']
+#     wmls = ['/home/diwu/Desktop/kaapana-data-to-check-brainviz/F1/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168/wmls/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168.nii.gz']
+    
+#     _json = '/home/diwu/Desktop/kaapana-data-to-check-brainviz/F1/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168/GetT1Metadata/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168.json'
+#     out_path = '/home/diwu/Desktop/2.pdf'
+#     _main(roi, icv, wmls, _json, out_path)
+    
+    
