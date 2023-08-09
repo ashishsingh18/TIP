@@ -11,13 +11,13 @@ import SimpleITK as sitk
 
 #### Hardcoded reference data ###
 # Harmonized reference MUSE values #
-MUSE_Ref_Values = '../refs/combinedharmonized_out.csv'
+MUSE_Ref_Values = '/refs/combinedharmonized_out.csv'
 # Left and Right ROIs indices as well as ROI name to ROI number equivalency #
-maphemi = pd.read_csv('../refs/MUSE_ROI_Dictionary.csv')
+maphemi = pd.read_csv('/refs/MUSE_ROI_Dictionary.csv')
 # Single ROI to combined ROI mapping #
-MUSE_ROI_Mapping = '../refs/MUSE_DerivedROIs_Mappings.csv'
+MUSE_ROI_Mapping = '/refs/MUSE_DerivedROIs_Mappings.csv'
 # Harmonized reference WMLS values #
-WMLS_Ref_Values = '../refs/WMLS_combinedrefs.csv'
+WMLS_Ref_Values = '/refs/WMLS_combinedrefs.csv'
 
 ################################################ FUNCTIONS ################################################
 
@@ -377,7 +377,7 @@ def _main(roi, icv, wmls, _json, out_path):
 	dfSub['Total White Matter Hyperintensity Volume'] = wmlsVol
 
 	### Add WMLS 604 reference datapoints to dfRef ###
-	WMLSref = pd.read_csv('../refs/WMLS_combinedrefs.csv').dropna()
+	WMLSref = pd.read_csv('/refs/WMLS_combinedrefs.csv').dropna()
 	WMLSref['Date'] = pd.to_datetime(WMLSref.Date)
 	WMLSref = WMLSref.sort_values(by='Date')
 	# Get first-time points only
@@ -418,20 +418,22 @@ def _main(roi, icv, wmls, _json, out_path):
 		pickle.dump(all_MuseROIs_name,pickle_file)
 
 
-if __name__ == '__main__':
+####### Local Test ##############
+
+# if __name__ == '__main__':
     
-    roi = ['/home/diwu/Desktop/kaapana-data-to-check-brainviz/F1/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168/relabel/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168.nii.gz']
-    # icv = '/home/diwu/Desktop/kaapana-data-to-check-brainviz/kaapana_Seis/2.16.840.1.114362.1.12035716.24525521429.585200304.999.1428/dlicv-inference/2.16.840.1.114362.1.12035716.24525521429.585200304.999.1428.nrrd'
-    # wmls = '/home/diwu/Desktop/kaapana-data-to-check-brainviz/kaapana_Seis/2.16.840.1.114362.1.12035716.24525521429.585200304.999.1428/wmls/2.16.840.1.114362.1.12035716.24525521429.585200304.999.1428.nrrd'
+#     roi = ['/home/diwu/Desktop/kaapana-data-to-check-brainviz/F1/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168/relabel/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168.nii.gz']
+#     # icv = '/home/diwu/Desktop/kaapana-data-to-check-brainviz/kaapana_Seis/2.16.840.1.114362.1.12035716.24525521429.585200304.999.1428/dlicv-inference/2.16.840.1.114362.1.12035716.24525521429.585200304.999.1428.nrrd'
+#     # wmls = '/home/diwu/Desktop/kaapana-data-to-check-brainviz/kaapana_Seis/2.16.840.1.114362.1.12035716.24525521429.585200304.999.1428/wmls/2.16.840.1.114362.1.12035716.24525521429.585200304.999.1428.nrrd'
     
-    # sitk.WriteImage(sitk.ReadImage(icv), '/home/diwu/Desktop/kaapana-data-to-check-brainviz/kaapana_Seis/2.16.840.1.114362.1.12035716.24525521429.585200304.999.1428/dlicv-inference/2.16.840.1.114362.1.12035716.24525521429.585200304.999.1428.nii.gz')
-    # sitk.WriteImage(sitk.ReadImage(wmls), '/home/diwu/Desktop/kaapana-data-to-check-brainviz/kaapana_Seis/2.16.840.1.114362.1.12035716.24525521429.585200304.999.1428/wmls/2.16.840.1.114362.1.12035716.24525521429.585200304.999.1428.nii.gz')
+#     # sitk.WriteImage(sitk.ReadImage(icv), '/home/diwu/Desktop/kaapana-data-to-check-brainviz/kaapana_Seis/2.16.840.1.114362.1.12035716.24525521429.585200304.999.1428/dlicv-inference/2.16.840.1.114362.1.12035716.24525521429.585200304.999.1428.nii.gz')
+#     # sitk.WriteImage(sitk.ReadImage(wmls), '/home/diwu/Desktop/kaapana-data-to-check-brainviz/kaapana_Seis/2.16.840.1.114362.1.12035716.24525521429.585200304.999.1428/wmls/2.16.840.1.114362.1.12035716.24525521429.585200304.999.1428.nii.gz')
     
-    icv = ['/home/diwu/Desktop/kaapana-data-to-check-brainviz/F1/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168/dlicv-inference/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168.nii.gz']
-    wmls = ['/home/diwu/Desktop/kaapana-data-to-check-brainviz/F1/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168/wmls/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168.nii.gz']
+#     icv = ['/home/diwu/Desktop/kaapana-data-to-check-brainviz/F1/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168/dlicv-inference/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168.nii.gz']
+#     wmls = ['/home/diwu/Desktop/kaapana-data-to-check-brainviz/F1/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168/wmls/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168.nii.gz']
     
-    _json = '/home/diwu/Desktop/kaapana-data-to-check-brainviz/F1/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168/GetT1Metadata/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168.json'
-    out_path = '/home/diwu/Desktop/2.pdf'
-    _main(roi, icv, wmls, _json, out_path)
+#     _json = '/home/diwu/Desktop/kaapana-data-to-check-brainviz/F1/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168/GetT1Metadata/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168.json'
+#     out_path = '/home/diwu/Desktop/2.pdf'
+#     _main(roi, icv, wmls, _json, out_path)
     
     
