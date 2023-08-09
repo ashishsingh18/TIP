@@ -208,3 +208,7 @@ def _main(pdf_path,in_path_biomarker,in_path_quant,in_path_brainvis):
 	print('\nTemp html file created!')
 	wp(html_out).write_pdf(pdf_path)
 	print('\nPDF plot file created!')
+
+
+if __name__ == '__main__':
+	pass
