@@ -111,6 +111,8 @@ def plotWithRef(dfRef, WMLSref, dfSub, fname, spareAD, spareBA):
 	mark = True
 
 	# Get only those reference subjects ±3 years from subject age
+	
+ 
 	lowlim = int(dfSub.Age.values[0]) - 3
 	uplim = int(dfSub.Age.values[0]) + 3
 
@@ -250,9 +252,6 @@ def plotWithRef(dfRef, WMLSref, dfSub, fname, spareAD, spareBA):
 			fig.append_trace( go.Scatter(mode='lines', x=XX_AD, y=XX10_AD, legendgroup='AD', marker=dict(color='MediumBlue', size=10), name='10th percentile for AD', line=dict(dash = 'dash'), showlegend=sl),row,column)
 			fig.append_trace( go.Scatter(mode='markers', x=dfSub.Age.tolist(), y=dfSub[selVar].tolist(), legendgroup='Patient', marker=dict(color='Black', symbol = 'circle-cross-open', size=16,line=dict(color='MediumPurple', width=3)), name='Patient', showlegend=sl),row,column)
 
-		# min_ = min(ADRef.Age.min(), CNRef.Age.min())
-		# max_ = min(ADRef.Age.max(), CNRef.Age.max())
-		# fig.update_xaxes(range=[min_, max_])
   
 		## Allow iteration through nx4 structure of plots
 		if column == 4:
@@ -273,7 +272,7 @@ def plotWithRef(dfRef, WMLSref, dfSub, fname, spareAD, spareBA):
 
 # TODO: 
 def makeFlagTablePKL(dfRef,mydict,MUSErois,path):
-	maphemi = pd.read_csv('../refs/MUSE_ROI_Dictionary.csv')
+	maphemi = pd.read_csv('/refs/MUSE_ROI_Dictionary.csv')
 	all_entries = ""
 
 	# Identify L and R pairs of single ROIs
@@ -368,22 +367,23 @@ def _main(dfSub, dfRef, WMLSref, allz_num, allz, all_MuseROIs_name, spareAD, spa
 	makeFlagTablePKL(dfRef,allz,all_MuseROIs_name,_os.path.join(out,UID+'_flagtable.pkl'))
  
 
-if __name__ == "__main__":
-    # dfRef = pd.read_pickle('/home/diwu/Desktop/kaapana-data-to-check-brainviz/F1/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168/roi-quantification/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168_dfRef.pkl')
-    # dfSub = pd.read_pickle('/home/diwu/Desktop/kaapana-data-to-check-brainviz/F1/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168/roi-quantification/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168_dfSub.pkl')
-    # WMLSref = pd.read_pickle('/home/diwu/Desktop/kaapana-data-to-check-brainviz/F1/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168/roi-quantification/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168_WMLSref.pkl')
-    # allz_num = pd.read_pickle('/home/diwu/Desktop/kaapana-data-to-check-brainviz/F1/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168/roi-quantification/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168_allz_num.pkl')
-    # allz = pd.read_pickle('/home/diwu/Desktop/kaapana-data-to-check-brainviz/F1/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168/roi-quantification/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168_allz.pkl')
-    # all_MuseROIs_name = pd.read_pickle('/home/diwu/Desktop/kaapana-data-to-check-brainviz/F1/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168/roi-quantification/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168_all_MuseROIs_name.pkl')
+##### This is for local testing ######
+# if __name__ == "__main__":
+#     # dfRef = pd.read_pickle('/home/diwu/Desktop/kaapana-data-to-check-brainviz/F1/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168/roi-quantification/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168_dfRef.pkl')
+#     # dfSub = pd.read_pickle('/home/diwu/Desktop/kaapana-data-to-check-brainviz/F1/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168/roi-quantification/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168_dfSub.pkl')
+#     # WMLSref = pd.read_pickle('/home/diwu/Desktop/kaapana-data-to-check-brainviz/F1/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168/roi-quantification/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168_WMLSref.pkl')
+#     # allz_num = pd.read_pickle('/home/diwu/Desktop/kaapana-data-to-check-brainviz/F1/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168/roi-quantification/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168_allz_num.pkl')
+#     # allz = pd.read_pickle('/home/diwu/Desktop/kaapana-data-to-check-brainviz/F1/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168/roi-quantification/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168_allz.pkl')
+#     # all_MuseROIs_name = pd.read_pickle('/home/diwu/Desktop/kaapana-data-to-check-brainviz/F1/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168/roi-quantification/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168_all_MuseROIs_name.pkl')
     
-    dfRef = pd.read_pickle('/home/diwu/Desktop/2_dfRef.pkl')
-    dfSub = pd.read_pickle('/home/diwu/Desktop/2_dfSub.pkl')
-    WMLSref = pd.read_pickle('/home/diwu/Desktop/2_WMLSref.pkl')
-    allz_num = pd.read_pickle('/home/diwu/Desktop/2_allz_num.pkl')
-    allz = pd.read_pickle('/home/diwu/Desktop/2_allz.pkl')
-    all_MuseROIs_name = pd.read_pickle('/home/diwu/Desktop/2_all_MuseROIs_name.pkl')
-    spareAD = pd.read_pickle('/home/diwu/Desktop/kaapana-data-to-check-brainviz/F1/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168/spare-calculation/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168_spareAD.pkl')
-    spareBA = pd.read_pickle('/home/diwu/Desktop/kaapana-data-to-check-brainviz/F1/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168/spare-calculation/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168_spareBA.pkl')
-    pdf_path = '/home/diwu/Desktop/F1.pdf'
+#     dfRef = pd.read_pickle('/home/diwu/Desktop/2_dfRef.pkl')
+#     dfSub = pd.read_pickle('/home/diwu/Desktop/2_dfSub.pkl')
+#     WMLSref = pd.read_pickle('/home/diwu/Desktop/2_WMLSref.pkl')
+#     allz_num = pd.read_pickle('/home/diwu/Desktop/2_allz_num.pkl')
+#     allz = pd.read_pickle('/home/diwu/Desktop/2_allz.pkl')
+#     all_MuseROIs_name = pd.read_pickle('/home/diwu/Desktop/2_all_MuseROIs_name.pkl')
+#     spareAD = pd.read_pickle('/home/diwu/Desktop/kaapana-data-to-check-brainviz/F1/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168/spare-calculation/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168_spareAD.pkl')
+#     spareBA = pd.read_pickle('/home/diwu/Desktop/kaapana-data-to-check-brainviz/F1/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168/spare-calculation/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168_spareBA.pkl')
+#     pdf_path = '/home/diwu/Desktop/F1.pdf'
     
-    _main(dfSub, dfRef, WMLSref, allz_num, allz, all_MuseROIs_name, spareAD, spareBA, pdf_path)
+#     _main(dfSub, dfRef, WMLSref, allz_num, allz, all_MuseROIs_name, spareAD, spareBA, pdf_path)
