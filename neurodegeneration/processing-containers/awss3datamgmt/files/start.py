@@ -24,11 +24,14 @@ from subprocess import PIPE, run
 # os.environ["AWS_CONFIG_FILE_PATH"] = str(None)
 # os.environ["AWS_ACCESS_KEY"] = str(None)
 # os.environ["AWS_SECRET_KEY"] = str(None)
-# os.environ["S3_BUCKET_NAME"] = "from-kaapana"
+# os.environ["S3_BUCKET_NAME"] = "to-kaapana"
 # os.environ['S3_OBJECT_NAME_PREFIX']= "T1/S"
-# os.environ["S3_ACTION"] = 'put'
-# os.environ["S3_OBJECT_SERIES_UID"] = "2.16.840.1.114362.1.12066432.24920037488.604832115.605.168"
+# os.environ["S3_ACTION"] = 'get'
+# os.environ["S3_OBJECT_SERIES_UID"] = "2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607"
 # os.environ["S3_OBJECT_SERIES_DESCRIPTION"] = "T1"
+# os.environ["S3_OBJECT_GET_EXTENSION"]=".zip" #downloaded from S3 with this extension
+# os.environ["S3_OBJECT_PUT_SUFFIX"]="_0000_0000"
+# os.environ["S3_OBJECT_PUT_EXTENSION"]=".nii.gz" #uploaded to s3 with this extension
 
 execution_timeout = 300
 
@@ -44,6 +47,9 @@ s3_object_name_prefix = os.environ['S3_OBJECT_NAME_PREFIX']
 s3_action=os.environ["S3_ACTION"]
 #seruid = os.environ["S3_OBJECT_SERIES_UID"]
 series_description = os.environ["S3_OBJECT_SERIES_DESCRIPTION"]
+s3_object_get_extension = os.environ["S3_OBJECT_GET_EXTENSION"]
+s3_object_put_extension = os.environ["S3_OBJECT_PUT_EXTENSION"]
+s3_object_put_suffix = os.environ["S3_OBJECT_PUT_SUFFIX"]#needed for older nnunet version
 
 # set aws specific env variables if specified by user
 if(aws_access_key != 'None'):
@@ -96,11 +102,10 @@ def get_seriesuid(bucket_name,object_key):
   object_metadata = s3.head_object(Bucket=bucket_name, Key=object_key)['Metadata']
   seriesuid = object_metadata['seriesuid']
   print("series uid = ", seriesuid)
-  return seriesuid
 
-#retrieve metadata
-def retrieve_metadata(bucket_name, seruid):
-    print("Entered retrieve_metadata")
+#retrieve objectname matching uid
+def retrieve_objectname_matching_uid(bucket_name, seruid):
+    print("#####Entered retrieve object name matching uid#####")
     s3 = boto3.client('s3')
 
     response = s3.list_objects(Bucket=bucket_name)
@@ -120,7 +125,7 @@ def retrieve_metadata(bucket_name, seruid):
         
 #list files in bucket
 def list_files(bucket_name):
-    print("Entered list_files")
+    print("####Entered list_files#####")
     print("bucket name: ", bucket_name)
     s3_client = boto3.client('s3')
 
@@ -141,7 +146,7 @@ def upload_file(file_name, bucket, uid,object_name=None):
     :param object_name: S3 object name. If not specified then file_name is used
     :return: True if file was uploaded, else False
     """
-    print("Entered upload_file")
+    print("#####Entered upload_file#####")
     print('object_name: ', object_name)
     print('file name: ', file_name)
     print("bucket name: ", bucket)
@@ -161,18 +166,18 @@ def upload_file(file_name, bucket, uid,object_name=None):
         return False
     return True
 
-def download_file(file_name,bucket_name,uid,object_name=None):
-    print("Entered download_file")
-    print('object_name: ', object_name)
+def download_file(file_name,bucket_name,uid):
+    print("######Entered download_file######")
     print('file name: ', file_name)
     print("bucket name: ", bucket_name)
     print("series uid: ", uid)
     s3 = boto3.client('s3')
     try:
-        object_name = retrieve_metadata(bucket_name,uid)
+        object_name = retrieve_objectname_matching_uid(bucket_name,uid)
         if(object_name == ""):
           print("object not found!")
         else:
+          print("object name: ", object_name)
           response = s3.download_file(bucket_name, object_name, file_name)
     except ClientError as e:
         print(e)
@@ -180,7 +185,7 @@ def download_file(file_name,bucket_name,uid,object_name=None):
     return True
 
 def remove_object(bucket_name, object_name):
-    print("Entered remove_object")
+    print("######Entered remove_object#######")
     print('object_name: ', object_name)
     print("bucket name: ", bucket_name)
     s3_client = boto3.client('s3')
@@ -190,7 +195,7 @@ def remove_object(bucket_name, object_name):
         print(e)
 
 def remove_all_objects(bucket_name):
-    print("Entered remove_all_objects")
+    print("######Entered remove_all_objects########")
     print("bucket name: ", bucket_name)
     response = list_files(bucket_name)
     for object in response['Contents']:
@@ -198,7 +203,7 @@ def remove_all_objects(bucket_name):
         remove_object(bucket_name, object['Key'])
         
 def empty_bucket(bucket_name):
-    print("Entered empty_bucket")
+    print("######Entered empty_bucket#######")
     print("bucket name: ", bucket_name)
     s3 = boto3.resource('s3')
     s3.Bucket(bucket_name).objects.delete()
@@ -268,7 +273,8 @@ for batch_element_dir in batch_folders:
     print(f"# Found {len(input_files)} input-files!")
 
     # add a uuid to prefix to generate unique name
-    s3_object_name = s3_object_name_prefix +  uuid.uuid4().hex + str(processed_count+1) + "_0000_0000.nii.gz"
+    # s3_object_name = s3_object_name_prefix +  uuid.uuid4().hex +  str(processed_count+1) + "_0000_0000.nii.gz"
+    s3_object_name = s3_object_name_prefix +  uuid.uuid4().hex +  str(processed_count+1) + s3_object_put_suffix + s3_object_put_extension
     print('s3 object name: ', s3_object_name)
     # Single process:
     # Loop for every input-file found with extension 'input_file_extension'
@@ -288,8 +294,11 @@ for batch_element_dir in batch_folders:
             print('upload to S3 bucket done.')
 
         if(s3_action == 'get'):
-            output_file_path = os.path.join(element_output_dir, "{}.nii.gz".format(os.path.basename(batch_element_dir)))
-            download_file(output_file_path,s3_bucket_name,uid,s3_object_name)
+            #output_file_path = os.path.join(element_output_dir, "{}.nii.gz".format(os.path.basename(batch_element_dir)))
+            #it could either be .nii.gz or .zip ,the extension must be specified by user
+            output_file_path = os.path.join(element_output_dir, "{}{}".format(os.path.basename(batch_element_dir),s3_object_get_extension))
+            print("output_file_path: ",output_file_path)
+            download_file(output_file_path,s3_bucket_name,uid)
             print("download from S3 bucket done.")
 
         if(s3_action == 'remove'):
