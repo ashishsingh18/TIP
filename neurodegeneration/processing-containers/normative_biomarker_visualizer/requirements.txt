@@ -6,5 +6,4 @@ scipy==1.7.0
 pynrrd==0.4.2
 matplotlib==3.4.2
 kaleido==0.2.1
-opencv-python
 scikit-learn==1.0.1
