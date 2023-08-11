@@ -7,8 +7,6 @@ from datetime import datetime
 import csv as _csv
 import os as _os
   
-import SimpleITK as sitk
-
 #### Hardcoded reference data ###
 # Harmonized reference MUSE values #
 MUSE_Ref_Values = '/refs/combinedharmonized_out.csv'
