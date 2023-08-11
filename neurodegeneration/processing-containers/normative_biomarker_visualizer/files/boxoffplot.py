@@ -1,16 +1,10 @@
 import os as _os
 import numpy as np
-#import cv2
-
 from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
 
 def WMHbox(fname):
-	# Add 16 pixels to top of image and 35 to right of image to allow box to be drawn
-	# plot = cv2.imread(fname)
-	# padded_plot = np.pad(plot,((16,0),(0,35),(0,0)),'constant',constant_values=255)
-	# cv2.imwrite(fname, padded_plot)
 	img = Image.open(fname)
 	plot = np.array(img)
 	padding_values = ((16, 0), (0, 35), (0, 0))
