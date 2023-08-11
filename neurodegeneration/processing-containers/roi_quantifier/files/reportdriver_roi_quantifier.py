@@ -5,13 +5,13 @@ import roi_quantifier
 from datetime import datetime
 
 # For local testng
-#os.environ["WORKFLOW_DIR"] = "/data"
-#os.environ["BATCH_NAME"] = "batch"
-#os.environ["OPERATOR_OUT_DIR"] = "output"
-#os.environ["OPERATOR_IN_DCM_METADATA_DIR"] = "dcm2json"
-#os.environ["OPERATOR_IN_DIR_ICV"] = "None"
-#os.environ["OPERATOR_IN_DIR_ROI"] = "deepmrseg"
-#os.environ["OPERATOR_IN_DIR_WMLS"]
+# os.environ["WORKFLOW_DIR"] = "/sharedFolder/M9"
+# os.environ["BATCH_NAME"] = "batch"
+# os.environ["OPERATOR_OUT_DIR"] = "/sharedFolder/M9/output"
+# os.environ["OPERATOR_IN_DCM_METADATA_DIR"] = "GetT1Metadata"
+# os.environ["OPERATOR_IN_DIR_ICV"] = "extract_dlicv_result"
+# os.environ["OPERATOR_IN_DIR_ROI"] = "extract_muse_result"
+# os.environ["OPERATOR_IN_DIR_WMLS"] = 'wmls-output'
 
 # From the template
 batch_folders = sorted([f for f in glob.glob(os.path.join('/', os.environ['WORKFLOW_DIR'], os.environ['BATCH_NAME'], '*'))])
