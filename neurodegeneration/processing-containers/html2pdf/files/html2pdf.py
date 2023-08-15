@@ -199,7 +199,7 @@ def writeHtml(plots, tables, flagtable, dftable, outName, brainplot):#, wmlstabl
 	</html>'''
  
 	now = datetime.datetime.now()
-	formatted_datetime = 'Report Creation Date: ' + now.strftime("%m/%d/%Y") + ' Time: ' + now.strftime("%H:%M:%S")
+	formatted_datetime = 'Report Creation Date (UTC): ' + now.strftime("%m/%d/%Y") + ' Time: ' + now.strftime("%H:%M:%S")
 	html_string_test = html_string_test.replace("[datetime]", formatted_datetime)
 	f = open(outName,'w')
 	f.write(html_string_test)
