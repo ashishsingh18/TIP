@@ -326,6 +326,19 @@ def makeFlagTablePKL(dfRef,mydict,MUSErois,path):
 	# THEN after getting all abnormal ROI names, rank by extrema and then place into table with R vol, L vol, R-zscore, L-zscore, AI, and Z-zscore
 	orderedbases = [k for k, v in sorted(priority_dict.items(), key=lambda item: item[1], reverse=True)]
 
+	dic = {
+     'Deep Nuclei': 'deep-nuclei', 
+     'Limbic' : 'limbic', 
+     'Parietal' : 'parietal', 
+     'Frontal': 'frontal', 
+     'Ventricle': 'ventricle', 
+     'Deep White' : 'deep-white', 
+     'Midline': 'midline',
+     'Occipital': 'occipital', 
+     'Cerebellum': 'cerebellum',
+     'Temporal': 'temporal'}
+	
+	
 	for index, key in enumerate(orderedbases):
 		tbody = ""
 		left = 'Left ' + lowercase(key)
@@ -337,8 +350,9 @@ def makeFlagTablePKL(dfRef,mydict,MUSErois,path):
 		ai = str(AI_subj[key])
 		ai_zscore = AI_zscores[key]
 		lobe = list(maphemi.loc[(maphemi['ROI_NAME'] == str(left)), 'SUBGROUP_0'].values)[0]
-		tbody = '''<tr style="text-align: center;"><td style="font-weight:normal;">''' + key + '''<img src="/logos/''' + lobe + '''.jpg"''' + ''' style="width: 5px; height: 5px;"></img></td><td style="font-weight:normal">''' + r_vol + '''</td><td class=''' + tagID(r_zscore) + ''' style="font-weight:normal">''' + str(round(r_zscore,2)) + '''</td><td style="font-weight:normal">''' + l_vol + '''</td><td class=''' + tagID(l_zscore) + ''' style="font-weight:normal">''' + str(round(l_zscore,2)) + '''</td><td style="font-weight:normal">''' + ai + '''</td><td class=''' + tagAI_ID(ai_zscore) + ''' style="font-weight:normal">''' + str(round(ai_zscore,2)) + '''</td></tr>'''
+		tbody = '''<tr style="text-align: center;"><td style="font-weight:normal;">''' + key + '''<div class="ball ''' + dic[lobe] + '''"></div></td><td style="font-weight:normal">''' + r_vol + '''</td><td class=''' + tagID(r_zscore) + ''' style="font-weight:normal">''' + str(round(r_zscore,2)) + '''</td><td style="font-weight:normal">''' + l_vol + '''</td><td class=''' + tagID(l_zscore) + ''' style="font-weight:normal">''' + str(round(l_zscore,2)) + '''</td><td style="font-weight:normal">''' + ai + '''</td><td class=''' + tagAI_ID(ai_zscore) + ''' style="font-weight:normal">''' + str(round(ai_zscore,2)) + '''</td></tr>'''
 		all_entries = all_entries + '''<tbody id=''' + "section" + str(index) + '''>''' + tbody + '''</tbody>'''
+  
 
 	string = '''<table border=1 frame=void rules=rows>
 		<thead>
@@ -367,23 +381,23 @@ def _main(dfSub, dfRef, WMLSref, allz_num, allz, all_MuseROIs_name, spareAD, spa
 	makeFlagTablePKL(dfRef,allz,all_MuseROIs_name,_os.path.join(out,UID+'_flagtable.pkl'))
  
 
-##### This is for local testing ######
+# #### This is for local testing ######
 # if __name__ == "__main__":
-#     # dfRef = pd.read_pickle('/home/diwu/Desktop/kaapana-data-to-check-brainviz/F1/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168/roi-quantification/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168_dfRef.pkl')
-#     # dfSub = pd.read_pickle('/home/diwu/Desktop/kaapana-data-to-check-brainviz/F1/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168/roi-quantification/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168_dfSub.pkl')
-#     # WMLSref = pd.read_pickle('/home/diwu/Desktop/kaapana-data-to-check-brainviz/F1/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168/roi-quantification/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168_WMLSref.pkl')
-#     # allz_num = pd.read_pickle('/home/diwu/Desktop/kaapana-data-to-check-brainviz/F1/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168/roi-quantification/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168_allz_num.pkl')
-#     # allz = pd.read_pickle('/home/diwu/Desktop/kaapana-data-to-check-brainviz/F1/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168/roi-quantification/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168_allz.pkl')
-#     # all_MuseROIs_name = pd.read_pickle('/home/diwu/Desktop/kaapana-data-to-check-brainviz/F1/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168/roi-quantification/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168_all_MuseROIs_name.pkl')
+#     dfRef = pd.read_pickle('/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/roi-quantification/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607_dfRef.pkl')
+#     dfSub = pd.read_pickle('/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/roi-quantification/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607_dfSub.pkl')
+#     WMLSref = pd.read_pickle('/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/roi-quantification/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607_WMLSref.pkl')
+#     allz_num = pd.read_pickle('/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/roi-quantification/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607_allz_num.pkl')
+#     allz = pd.read_pickle('/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/roi-quantification/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607_allz.pkl')
+#     all_MuseROIs_name = pd.read_pickle('/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/roi-quantification/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607_all_MuseROIs_name.pkl')
     
-#     dfRef = pd.read_pickle('/home/diwu/Desktop/2_dfRef.pkl')
-#     dfSub = pd.read_pickle('/home/diwu/Desktop/2_dfSub.pkl')
-#     WMLSref = pd.read_pickle('/home/diwu/Desktop/2_WMLSref.pkl')
-#     allz_num = pd.read_pickle('/home/diwu/Desktop/2_allz_num.pkl')
-#     allz = pd.read_pickle('/home/diwu/Desktop/2_allz.pkl')
-#     all_MuseROIs_name = pd.read_pickle('/home/diwu/Desktop/2_all_MuseROIs_name.pkl')
-#     spareAD = pd.read_pickle('/home/diwu/Desktop/kaapana-data-to-check-brainviz/F1/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168/spare-calculation/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168_spareAD.pkl')
-#     spareBA = pd.read_pickle('/home/diwu/Desktop/kaapana-data-to-check-brainviz/F1/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168/spare-calculation/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168_spareBA.pkl')
-#     pdf_path = '/home/diwu/Desktop/F1.pdf'
+#     # dfRef = pd.read_pickle('/home/diwu/Desktop/2_dfRef.pkl')
+#     # dfSub = pd.read_pickle('/home/diwu/Desktop/2_dfSub.pkl')
+#     # WMLSref = pd.read_pickle('/home/diwu/Desktop/2_WMLSref.pkl')
+#     # allz_num = pd.read_pickle('/home/diwu/Desktop/2_allz_num.pkl')
+#     # allz = pd.read_pickle('/home/diwu/Desktop/2_allz.pkl')
+#     # all_MuseROIs_name = pd.read_pickle('/home/diwu/Desktop/2_all_MuseROIs_name.pkl')
+#     spareAD = pd.read_pickle('/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/spare-calculation/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607_spareAD.pkl')
+#     spareBA = pd.read_pickle('/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/spare-calculation/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607_spareBA.pkl')
+#     pdf_path = '/home/diwu/Desktop/F2.pdf'
     
 #     _main(dfSub, dfRef, WMLSref, allz_num, allz, all_MuseROIs_name, spareAD, spareBA, pdf_path)

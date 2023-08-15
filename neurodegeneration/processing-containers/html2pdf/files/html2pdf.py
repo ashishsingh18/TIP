@@ -2,8 +2,9 @@ from IPython.display import HTML as idhtml
 from weasyprint import HTML as wp
 import os as _os
 import pickle
-import pandas
+import pandas as pd
 import glob
+import datetime as datetime
 
 ## Write the HTML code for display --- TODO: Move to seperate python file
 def writeHtml(plots, tables, flagtable, dftable, outName, brainplot):#, wmlstable):#brainplot, wmlsplots, wmlstable):
@@ -25,7 +26,7 @@ def writeHtml(plots, tables, flagtable, dftable, outName, brainplot):#, wmlstabl
 	for table in flagtable:
 		ind = '' + table + ''
 		all_flag = all_flag + ind
-
+  
 	#HTML code for report structure
 	html_string_test = '''
 	<html>
@@ -36,6 +37,25 @@ def writeHtml(plots, tables, flagtable, dftable, outName, brainplot):#, wmlstabl
 			.toohigh { background: #ADD8E6 !important; color: white; }
 			.toolow { background: #FFB6C1 !important; color: white; }
 			.norm { background: white !important; color: white; }
+			.ball {
+				width: 5px;
+				height: 5px;
+				border-radius: 50%;
+				margin: 1px;
+				display: inline-block;
+			}
+			.cerebellum {background-color: rgb(0, 0, 0) !important;}
+			.deep-nuclei {background-color: rgb(104, 52, 153) !important;}
+			.deep-white {background-color: rgb(165, 165, 165) !important;}
+			.frontal {background-color: rgb(176, 36, 23) !important;}
+			.limbic {background-color: rgb(234, 51, 35) !important;}
+			.midline {background-color: rgb(126, 171, 86) !important;}
+			.occipital {background-color: rgb(223, 131, 68) !important;}
+			.parietal {background-color: rgb(245, 194, 66) !important;}
+			.temporal {background-color: rgb(80, 113, 190) !important;}
+			.ventricle {background-color: rgb(79, 173, 234) !important;}
+
+   
 			h6 { margin: 0.5em 0 0.5em 0 ! important; 
 				position: relative ! important;
 				padding: 5px 15px ! important;
@@ -49,7 +69,7 @@ def writeHtml(plots, tables, flagtable, dftable, outName, brainplot):#, wmlstabl
 			@page { margin: 45px 0px; }
 			.col-xs-8 {
   				text-align:center ! important;
-  				font-size: 12px ! important;
+  				font-size: 10px ! important;
 				}
 			.col-xs-2 {
 				font-size: 10px ! important;
@@ -123,8 +143,9 @@ def writeHtml(plots, tables, flagtable, dftable, outName, brainplot):#, wmlstabl
 				<p><b>''' + dftable.loc[0].values[0] + ' | ' + str(int(float(dftable.loc[1].values[0]))) + 'y' + ' ' + dftable.loc[2].values[0] + '''<br>Scan Date: ''' + dftable.loc[3].values[0] + '''</b></p>
 			</div>
 			<div class="col-xs-8">
-				<headtitle><b>Center for Biomedical Image Computing & Analytics | Penn Medicine</b></headtitle>
-				<headtitle><b>Neuroanalysis and Imaging Biomarkers Report</b></headtitle>
+				<headtitle><b>Center for Biomedical Image Computing & Analytics | Penn Medicine</b><br></headtitle>
+				<headtitle><b>Neuroanalysis and Imaging Biomarkers Report</b><br></headtitle>
+				<headtitle>[datetime]</headtitle> 
 			</div>
 		</div>
 		<div class="container">
@@ -145,29 +166,29 @@ def writeHtml(plots, tables, flagtable, dftable, outName, brainplot):#, wmlstabl
 		</div>
 		<div class="container">
 			<div class="col-xs-2">
-				<img src="/logos/Temporal.jpg" style="width: 5px; height: 5px;"></img> Temporal
+				<div class="ball temporal"></div> Temporal
 				<br>
-				<img src="/logos/Frontal.jpg" style="width: 5px; height: 5px;"></img> Frontal
+				<div class="ball frontal"></div> Frontal
 			</div>
 			<div class="col-xs-2">
-				<img src="/logos/Midline.jpg" style="width: 5px; height: 5px;"></img> Midline
+				<div class="ball midline"></div> Midline
 				<br>
-				<img src="/logos/Limbic.jpg" style="width: 5px; height: 5px;"></img> Limbic
+				<div class="ball limbic"></div> Limbic
 			</div>
 			<div class="col-xs-2">
-				<img src="/logos/Cerebellum.jpg" style="width: 5px; height: 5px;"></img> Cerebellum
+				<div class="ball cerebellum"></div> Cerebellum
 				<br>
-				<img src="/logos/Occipital.jpg" style="width: 5px; height: 5px;"></img> Occipital
+				<div class="ball occipital"></div> Occipital
 			</div>
 			<div class="col-xs-2">
-				<img src="/logos/Deep White.jpg" style="width: 5px; height: 5px;"></img> Deep White
+				<div class="ball deep-white"></div> Deep White
 				<br>
-				<img src="/logos/Ventricle.jpg" style="width: 5px; height: 5px;"></img> Ventricle
+				<div class="ball ventricle"></div> Ventricle
 			</div>
 			<div class="col-xs-2">
-				<img src="/logos/Deep Nuclei.jpg" style="width: 5px; height: 5px;"></img> Deep Nuclei
+				<div class="ball deep-nuclei"></div> Deep Nuclei
 				<br>
-				<img src="/logos/Parietal.jpg" style="width: 5px; height: 5px;"></img> Parietal
+				<div class="ball parietal"></div> Parietal
 			</div>
 		</div>
 		<br>
@@ -176,7 +197,10 @@ def writeHtml(plots, tables, flagtable, dftable, outName, brainplot):#, wmlstabl
 		</div>
 	</body>
 	</html>'''
-
+ 
+	now = datetime.datetime.now()
+	formatted_datetime = 'Report Creation Date (UTC): ' + now.strftime("%m/%d/%Y") + ' Time: ' + now.strftime("%H:%M:%S")
+	html_string_test = html_string_test.replace("[datetime]", formatted_datetime)
 	f = open(outName,'w')
 	f.write(html_string_test)
 	f.close()
@@ -192,15 +216,19 @@ def _main(pdf_path,in_path_biomarker,in_path_quant,in_path_brainvis):
 	print(_os.path.join(in_path_brainvis,UID+'_finalvis.png'))
 	brainplot.append(_os.path.join(in_path_brainvis,UID+'_finalvis.png'))
 	plots.append(_os.path.join(in_path_biomarker,UID+'_plot.png'))
+ 
+	tables.append(pd.read_pickle(_os.path.join(in_path_biomarker,UID+'_roisubsettable.pkl')))
+	flagtable.append(pd.read_pickle(_os.path.join(in_path_biomarker,UID+'_flagtable.pkl')))
+	dfPat = pd.read_pickle(_os.path.join(in_path_quant,UID+'_dfPat.pkl'))
 
-	with open(_os.path.join(in_path_biomarker,UID+'_roisubsettable.pkl'),'rb') as f:
-		tables.append(pickle.load(f))
+	# with open(_os.path.join(in_path_biomarker,UID+'_roisubsettable.pkl'),'rb') as f:
+	# 	tables.append(pickle.load(f))
 
-	with open(_os.path.join(in_path_biomarker,UID+'_flagtable.pkl'),'rb') as f:
-		flagtable.append(pickle.load(f))
+	# with open(_os.path.join(in_path_biomarker,UID+'_flagtable.pkl'),'rb') as f:
+	# 	flagtable.append(pickle.load(f))
 
-	with open(_os.path.join(in_path_quant,UID+'_dfPat.pkl'),'rb') as f:
-		dfPat = pickle.load(f)
+	# with open(_os.path.join(in_path_quant,UID+'_dfPat.pkl'),'rb') as f:
+	# 	dfPat = pickle.load(f)
 
 	html_out = _os.path.join(str(pdf_out),'report.html')
 
@@ -210,5 +238,9 @@ def _main(pdf_path,in_path_biomarker,in_path_quant,in_path_brainvis):
 	print('\nPDF plot file created!')
 
 
-if __name__ == '__main__':
-	pass
+# if __name__ == '__main__':
+# 	pdf_path = '/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607.pdf'
+# 	in_path_biomarker = '/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/biomarker-computation'
+# 	in_path_quant = '/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/roi-quantification'
+# 	in_path_brainvis = '/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/brain-visualize'
+# 	_main(pdf_path,in_path_biomarker,in_path_quant,in_path_brainvis)
