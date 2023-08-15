@@ -5,12 +5,12 @@ import pickle
 from datetime import datetime
 
 # For local testng
-#os.environ["WORKFLOW_DIR"] = "/Users/vikasbommineni/Desktop/MRIreport/data"
-#os.environ["BATCH_NAME"] = "batch"
-#os.environ["OPERATOR_OUT_DIR"] = "output"
-#os.environ["OPERATOR_IN_DIR_QUANT"] = "output"
-#os.environ["OPERATOR_IN_DIR_BIOMARKER"] = "output"
-#os.environ["OPERATOR_IN_DIR_BRAINVIS"] = "output"
+# os.environ["WORKFLOW_DIR"] = "/sharedFolder/F2/"
+# os.environ["BATCH_NAME"] = ""
+# os.environ["OPERATOR_OUT_DIR"] = "/sharedFolder/F2/output"
+# os.environ["OPERATOR_IN_DIR_QUANT"] = "roi-quantification"
+# os.environ["OPERATOR_IN_DIR_BIOMARKER"] = "biomarker-computation"
+# os.environ["OPERATOR_IN_DIR_BRAINVIS"] = "brain-visualize"
 
 # From the template
 batch_folders = sorted([f for f in glob.glob(os.path.join('/', os.environ['WORKFLOW_DIR'], os.environ['BATCH_NAME'], '*'))])
