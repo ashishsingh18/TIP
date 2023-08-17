@@ -5,6 +5,7 @@ import pickle
 import pandas as pd
 import glob
 import datetime as datetime
+import pytz
 
 ## Write the HTML code for display --- TODO: Move to seperate python file
 def writeHtml(plots, tables, flagtable, dftable, outName, brainplot):#, wmlstable):#brainplot, wmlsplots, wmlstable):
@@ -71,6 +72,11 @@ def writeHtml(plots, tables, flagtable, dftable, outName, brainplot):#, wmlstabl
   				text-align:center ! important;
   				font-size: 10px ! important;
 				}
+			.col-xs-4 {
+  				text-align:center ! important;
+  				font-size: 12px ! important;
+				margin-top: 18px !important;
+				}
 			.col-xs-2 {
 				font-size: 10px ! important;
 				}
@@ -87,13 +93,17 @@ def writeHtml(plots, tables, flagtable, dftable, outName, brainplot):#, wmlstabl
   				max-width: 100%;
   				}
   			.header{
-  			position: fixed;
-    		left: 0px;
-    		right: 0px;
-    		height: 42px;
-  			top: -45px;
-  			bottom: 0px;
-  			background-color: #D3D3D3 ! important;
+				position: fixed;
+				left: 0px;
+				right: 0px;
+				height: 42px;
+				top: -45px;
+				bottom: 0px;
+				display : flex;
+				align-items: center;
+				justify-content:space-between;
+				grid-template-columns: 1fr auto 1fr;
+				background-color: #D3D3D3 ! important;
   			}
   			.footer{
   			position: fixed;
@@ -137,13 +147,16 @@ def writeHtml(plots, tables, flagtable, dftable, outName, brainplot):#, wmlstabl
 				}
 		</style>
 	</head>
-	<body>
+	<body>	
 		<div class="header";>
 			<div class="col-xs-4">
 				<p><b>''' + dftable.loc[0].values[0] + ' | ' + str(int(float(dftable.loc[1].values[0]))) + 'y' + ' ' + dftable.loc[2].values[0] + '''<br>Scan Date: ''' + dftable.loc[3].values[0] + '''</b></p>
 			</div>
+
 			<div class="col-xs-8">
-				<headtitle><b>Center for Biomedical Image Computing & Analytics | Penn Medicine</b><br></headtitle>
+				<img src="/logos/cbica.png" alt='Sorry the image is broken' style='height:40px; width:300px'>
+			</div>
+			<div class="col-xs-8">
 				<headtitle><b>Neuroanalysis and Imaging Biomarkers Report</b><br></headtitle>
 				<headtitle>[datetime]</headtitle> 
 			</div>
@@ -198,8 +211,8 @@ def writeHtml(plots, tables, flagtable, dftable, outName, brainplot):#, wmlstabl
 	</body>
 	</html>'''
  
-	now = datetime.datetime.now()
-	formatted_datetime = 'Report Creation Date (UTC): ' + now.strftime("%m/%d/%Y") + ' Time: ' + now.strftime("%H:%M:%S")
+	now = datetime.datetime.now(pytz.timezone('US/Eastern'))
+	formatted_datetime = 'Report Creation Date (US/Eastern): ' + now.strftime("%m/%d/%Y") + ' Time: ' + now.strftime("%H:%M:%S")
 	html_string_test = html_string_test.replace("[datetime]", formatted_datetime)
 	f = open(outName,'w')
 	f.write(html_string_test)
@@ -221,17 +234,7 @@ def _main(pdf_path,in_path_biomarker,in_path_quant,in_path_brainvis):
 	flagtable.append(pd.read_pickle(_os.path.join(in_path_biomarker,UID+'_flagtable.pkl')))
 	dfPat = pd.read_pickle(_os.path.join(in_path_quant,UID+'_dfPat.pkl'))
 
-	# with open(_os.path.join(in_path_biomarker,UID+'_roisubsettable.pkl'),'rb') as f:
-	# 	tables.append(pickle.load(f))
-
-	# with open(_os.path.join(in_path_biomarker,UID+'_flagtable.pkl'),'rb') as f:
-	# 	flagtable.append(pickle.load(f))
-
-	# with open(_os.path.join(in_path_quant,UID+'_dfPat.pkl'),'rb') as f:
-	# 	dfPat = pickle.load(f)
-
 	html_out = _os.path.join(str(pdf_out),'report.html')
-
 	writeHtml(plots, tables, flagtable, dfPat, html_out, brainplot)
 	print('\nTemp html file created!')
 	wp(html_out).write_pdf(pdf_path)
