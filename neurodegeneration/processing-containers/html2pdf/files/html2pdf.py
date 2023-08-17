@@ -154,7 +154,7 @@ def writeHtml(plots, tables, flagtable, dftable, outName, brainplot):#, wmlstabl
 			</div>
 
 			<div class="col-xs-8">
-				<img src="/home/diwu/Desktop/TIP/neurodegeneration/processing-containers/html2pdf/logos/cbica.png" alt='Sorry the image is broken' style='height:40px; width:300px'>
+				<img src="/logos/cbica.png" alt='Sorry the image is broken' style='height:40px; width:300px'>
 			</div>
 			<div class="col-xs-8">
 				<headtitle><b>Neuroanalysis and Imaging Biomarkers Report</b><br></headtitle>
