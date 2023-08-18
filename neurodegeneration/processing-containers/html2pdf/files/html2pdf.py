@@ -67,12 +67,12 @@ def writeHtml(plots, tables, flagtable, dftable, outName, brainplot):#, wmlstabl
 			@page { margin: 45px 0px; }
 			.col-xs-8 {
   				text-align:center ! important;
-  				font-size: 10px ! important;
+  				font-size: 9px ! important;
 				}
 			.col-xs-4 {
   				text-align:center ! important;
-  				font-size: 12px ! important;
-				margin-top: 18px !important;
+  				font-size: 10px ! important;
+				margin-top: 15px !important;
 				}
 			.col-xs-2 {
 				font-size: 10px ! important;
@@ -151,8 +151,8 @@ def writeHtml(plots, tables, flagtable, dftable, outName, brainplot):#, wmlstabl
 			</div>
 
 			<div class="col-xs-8">
-				<img src="/home/diwu/Desktop/TIP/neurodegeneration/processing-containers/html2pdf/logos/cbica.png" alt='Sorry the image is broken' style='height:40px; width:100px'>
-				<img src="/home/diwu/Desktop/TIP/neurodegeneration/processing-containers/html2pdf/logos/PennMedicineLogo.png" alt='Sorry the image is broken' style='height:30px; width:180px'>
+				<img src="/logos/cbica.png" alt='Sorry the image is broken' style='height:40px; width:100px'>
+				<img src="/logos/PennMedicineLogo.png" alt='Sorry the image is broken' style='height:30px; width:180px'>
 
 			</div>
 			<div class="col-xs-8">\
@@ -240,9 +240,9 @@ def _main(pdf_path,in_path_biomarker,in_path_quant,in_path_brainvis):
 	print('\nPDF plot file created!')
 
 
-if __name__ == '__main__':
-	pdf_path = '/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607.pdf'
-	in_path_biomarker = '/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/biomarker-computation'
-	in_path_quant = '/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/roi-quantification'
-	in_path_brainvis = '/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/brain-visualize'
-	_main(pdf_path,in_path_biomarker,in_path_quant,in_path_brainvis)
+# if __name__ == '__main__':
+# 	pdf_path = '/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607.pdf'
+# 	in_path_biomarker = '/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/biomarker-computation'
+# 	in_path_quant = '/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/roi-quantification'
+# 	in_path_brainvis = '/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/brain-visualize'
+# 	_main(pdf_path,in_path_biomarker,in_path_quant,in_path_brainvis)
