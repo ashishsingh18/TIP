@@ -1,9 +1,6 @@
-from IPython.display import HTML as idhtml
 from weasyprint import HTML as wp
 import os as _os
-import pickle
 import pandas as pd
-import glob
 import datetime as datetime
 import pytz
 
@@ -154,9 +151,11 @@ def writeHtml(plots, tables, flagtable, dftable, outName, brainplot):#, wmlstabl
 			</div>
 
 			<div class="col-xs-8">
-				<img src="/logos/cbica.png" alt='Sorry the image is broken' style='height:40px; width:300px'>
+				<img src="/home/diwu/Desktop/TIP/neurodegeneration/processing-containers/html2pdf/logos/cbica.png" alt='Sorry the image is broken' style='height:40px; width:100px'>
+				<img src="/home/diwu/Desktop/TIP/neurodegeneration/processing-containers/html2pdf/logos/PennMedicineLogo.png" alt='Sorry the image is broken' style='height:30px; width:180px'>
+
 			</div>
-			<div class="col-xs-8">
+			<div class="col-xs-8">\
 				<headtitle><b>Neuroanalysis and Imaging Biomarkers Report</b><br></headtitle>
 				<headtitle>[datetime]</headtitle> 
 			</div>
@@ -241,9 +240,9 @@ def _main(pdf_path,in_path_biomarker,in_path_quant,in_path_brainvis):
 	print('\nPDF plot file created!')
 
 
-# if __name__ == '__main__':
-# 	pdf_path = '/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607.pdf'
-# 	in_path_biomarker = '/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/biomarker-computation'
-# 	in_path_quant = '/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/roi-quantification'
-# 	in_path_brainvis = '/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/brain-visualize'
-# 	_main(pdf_path,in_path_biomarker,in_path_quant,in_path_brainvis)
+if __name__ == '__main__':
+	pdf_path = '/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607.pdf'
+	in_path_biomarker = '/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/biomarker-computation'
+	in_path_quant = '/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/roi-quantification'
+	in_path_brainvis = '/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/brain-visualize'
+	_main(pdf_path,in_path_biomarker,in_path_quant,in_path_brainvis)
