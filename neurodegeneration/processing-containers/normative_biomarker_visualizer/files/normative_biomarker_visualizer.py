@@ -224,7 +224,7 @@ def plotWithRef(dfRef, WMLSref, dfSub, fname, spareAD, spareBA):
 			fig.append_trace( go.Scatter(mode='lines', x=XX_CN, y=XX50_CN, legendgroup='CN', marker=dict(color='MediumVioletRed', size=10), name='50th percentile for CN', showlegend=sl),row,column)
 			fig.append_trace( go.Scatter(mode='lines', x=XX_CN, y=XX10_CN, legendgroup='CN', marker=dict(color='MediumBlue', size=10), name='10th percentile for CN', showlegend=sl),row,column)
 			fig.append_trace( go.Scatter(mode='markers', x=dfSub.Age.tolist(), y=dfSub[selVar].tolist(), legendgroup='Patient', marker=dict(color='Black', symbol = 'circle-cross-open', size=16,line=dict(color='MediumPurple', width=3)), name='Patient', showlegend=sl),row,column)
-			fig.add_annotation(xref='x domain',yref='y domain',x=0.01,y=0.95, text='WMLS Volume: ' + str(round(dfSub[selVar].tolist()[0],2)), showarrow=False,row=row,col=column)
+			fig.add_annotation(xref='x domain',yref='y domain',x=0.01,y=0.95, text='WMLS Volume (mL\u00b3): ' + str(round(dfSub[selVar].tolist()[0],2)), showarrow=False,row=row,col=column)
 
 		else:
 

@@ -1,9 +1,6 @@
-from IPython.display import HTML as idhtml
 from weasyprint import HTML as wp
 import os as _os
-import pickle
 import pandas as pd
-import glob
 import datetime as datetime
 import pytz
 
@@ -70,12 +67,12 @@ def writeHtml(plots, tables, flagtable, dftable, outName, brainplot):#, wmlstabl
 			@page { margin: 45px 0px; }
 			.col-xs-8 {
   				text-align:center ! important;
-  				font-size: 10px ! important;
+  				font-size: 9px ! important;
 				}
 			.col-xs-4 {
   				text-align:center ! important;
-  				font-size: 12px ! important;
-				margin-top: 18px !important;
+  				font-size: 10px ! important;
+				margin-top: 15px !important;
 				}
 			.col-xs-2 {
 				font-size: 10px ! important;
@@ -154,9 +151,11 @@ def writeHtml(plots, tables, flagtable, dftable, outName, brainplot):#, wmlstabl
 			</div>
 
 			<div class="col-xs-8">
-				<img src="/logos/cbica.png" alt='Sorry the image is broken' style='height:40px; width:300px'>
+				<img src="/logos/cbica.png" alt='Sorry the image is broken' style='height:40px; width:100px'>
+				<img src="/logos/PennMedicineLogo.png" alt='Sorry the image is broken' style='height:30px; width:180px'>
+
 			</div>
-			<div class="col-xs-8">
+			<div class="col-xs-8">\
 				<headtitle><b>Neuroanalysis and Imaging Biomarkers Report</b><br></headtitle>
 				<headtitle>[datetime]</headtitle> 
 			</div>

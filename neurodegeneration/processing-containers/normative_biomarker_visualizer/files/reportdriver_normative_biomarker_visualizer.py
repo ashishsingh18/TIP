@@ -4,13 +4,13 @@ import normative_biomarker_visualizer
 import pickle
 from datetime import datetime
 
-# For local testng
-#os.environ["WORKFLOW_DIR"] = "/sharedFolder/M9"
-#os.environ["BATCH_NAME"] = "batch"
-#os.environ["OPERATOR_OUT_DIR"] = "ouput"
-#os.environ["OPERATOR_IN_DIR_ROI"] = "extract_muse_result"
-#os.environ["OPERATOR_IN_DIR_QUANT"] = ''
-#os.environ["OPERATOR_IN_DIR_SPARE"] = ''
+# # For local testng
+# os.environ["WORKFLOW_DIR"] = "/sharedFolder/5datasets_F8F12F18M13M5/F8"
+# os.environ["BATCH_NAME"] = "batch"
+# os.environ["OPERATOR_OUT_DIR"] = "/sharedFolder/5datasets_F8F12F18M13M5/F8/ouput"
+# os.environ["OPERATOR_IN_DIR_ROI"] = "extract_muse_result"
+# os.environ["OPERATOR_IN_DIR_QUANT"] = 'roi-quantification'
+# os.environ["OPERATOR_IN_DIR_SPARE"] = 'spare-calculation'
 
 # From the template
 batch_folders = sorted([f for f in glob.glob(os.path.join('/', os.environ['WORKFLOW_DIR'], os.environ['BATCH_NAME'], '*'))])
