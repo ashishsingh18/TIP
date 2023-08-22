@@ -240,9 +240,9 @@ def _main(pdf_path,in_path_biomarker,in_path_quant,in_path_brainvis):
 	print('\nPDF plot file created!')
 
 
-if __name__ == '__main__':
-	pdf_path = '/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607.pdf'
-	in_path_biomarker = '/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/biomarker-computation'
-	in_path_quant = '/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/roi-quantification'
-	in_path_brainvis = '/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/brain-visualize'
-	_main(pdf_path,in_path_biomarker,in_path_quant,in_path_brainvis)
+# if __name__ == '__main__':
+# 	pdf_path = '/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607.pdf'
+# 	in_path_biomarker = '/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/biomarker-computation'
+# 	in_path_quant = '/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/roi-quantification'
+# 	in_path_brainvis = '/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/brain-visualize'
+# 	_main(pdf_path,in_path_biomarker,in_path_quant,in_path_brainvis)
