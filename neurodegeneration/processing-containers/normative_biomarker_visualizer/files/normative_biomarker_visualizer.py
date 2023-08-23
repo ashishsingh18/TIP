@@ -205,26 +205,34 @@ def plotWithRef(dfRef, WMLSref, dfSub, fname, spareAD, spareBA):
 		setmin = setmin - spacer
 
 		if selVar == 'Total White Matter Hyperintensity Volume':
-			CN_up5 = [abs(int(i)-(int(dfSub['Age'].values[0])+3)) for i in XX_CN]
-			CN_down5 = [abs(int(i)-(int(dfSub['Age'].values[0])-3)) for i in XX_CN]
+			if dfSub[selVar].tolist()[0] != 0:
+				CN_up5 = [abs(int(i)-(int(dfSub['Age'].values[0])+3)) for i in XX_CN]
+				CN_down5 = [abs(int(i)-(int(dfSub['Age'].values[0])-3)) for i in XX_CN]
 
-			setmax = max([XX90_CN[CN_up5.index(min(CN_up5))],XX90_CN[CN_down5.index(min(CN_down5))],CNRef[selVar].tolist()[0]])
-			setmin = min([XX10_CN[CN_up5.index(min(CN_up5))],XX10_CN[CN_down5.index(min(CN_down5))],CNRef[selVar].tolist()[0]])
-   
-			## Max value to be setmax or the patient dot value 
-			setmax = max(setmax, dfSub[selVar].tolist()[0])
-			setmin = min(setmin, dfSub[selVar].tolist()[0])
-   
-			spacer = (setmax - setmin)*.4
-			setmax = setmax + spacer
-			setmin = max(0,setmin - spacer)
-   
-			fig.append_trace( go.Scatter(mode='markers', x=CNRef.Age.tolist(), y=CNRef[selVar].tolist(), legendgroup='CN', marker=dict(color='MediumBlue', size=5), opacity=0.2, name='CN Reference', showlegend=sl),row,column)
-			fig.append_trace( go.Scatter(mode='lines', x=XX_CN, y=XX90_CN, legendgroup='CN', marker=dict(color='MediumPurple', size=10), name='90th percentile for CN', showlegend=sl),row,column)
-			fig.append_trace( go.Scatter(mode='lines', x=XX_CN, y=XX50_CN, legendgroup='CN', marker=dict(color='MediumVioletRed', size=10), name='50th percentile for CN', showlegend=sl),row,column)
-			fig.append_trace( go.Scatter(mode='lines', x=XX_CN, y=XX10_CN, legendgroup='CN', marker=dict(color='MediumBlue', size=10), name='10th percentile for CN', showlegend=sl),row,column)
-			fig.append_trace( go.Scatter(mode='markers', x=dfSub.Age.tolist(), y=dfSub[selVar].tolist(), legendgroup='Patient', marker=dict(color='Black', symbol = 'circle-cross-open', size=16,line=dict(color='MediumPurple', width=3)), name='Patient', showlegend=sl),row,column)
-			fig.add_annotation(xref='x domain',yref='y domain',x=0.01,y=0.95, text='WMLS Volume (mL\u00b3): ' + str(round(dfSub[selVar].tolist()[0],2)), showarrow=False,row=row,col=column)
+				setmax = max([XX90_CN[CN_up5.index(min(CN_up5))],XX90_CN[CN_down5.index(min(CN_down5))],CNRef[selVar].tolist()[0]])
+				setmin = min([XX10_CN[CN_up5.index(min(CN_up5))],XX10_CN[CN_down5.index(min(CN_down5))],CNRef[selVar].tolist()[0]])
+	
+				## Max value to be setmax or the patient dot value 
+				setmax = max(setmax, dfSub[selVar].tolist()[0])
+				setmin = min(setmin, dfSub[selVar].tolist()[0])
+	
+				spacer = (setmax - setmin)*.4
+				setmax = setmax + spacer
+				setmin = max(0,setmin - spacer)
+	
+				fig.append_trace( go.Scatter(mode='markers', x=CNRef.Age.tolist(), y=CNRef[selVar].tolist(), legendgroup='CN', marker=dict(color='MediumBlue', size=5), opacity=0.2, name='CN Reference', showlegend=sl),row,column)
+				fig.append_trace( go.Scatter(mode='lines', x=XX_CN, y=XX90_CN, legendgroup='CN', marker=dict(color='MediumPurple', size=10), name='90th percentile for CN', showlegend=sl),row,column)
+				fig.append_trace( go.Scatter(mode='lines', x=XX_CN, y=XX50_CN, legendgroup='CN', marker=dict(color='MediumVioletRed', size=10), name='50th percentile for CN', showlegend=sl),row,column)
+				fig.append_trace( go.Scatter(mode='lines', x=XX_CN, y=XX10_CN, legendgroup='CN', marker=dict(color='MediumBlue', size=10), name='10th percentile for CN', showlegend=sl),row,column)
+				fig.append_trace( go.Scatter(mode='markers', x=dfSub.Age.tolist(), y=dfSub[selVar].tolist(), legendgroup='Patient', marker=dict(color='Black', symbol = 'circle-cross-open', size=16,line=dict(color='MediumPurple', width=3)), name='Patient', showlegend=sl),row,column)
+				fig.add_annotation(xref='x domain',yref='y domain',x=0.01,y=0.95, text='WMLS Volume (mL\u00b3): ' + str(round(dfSub[selVar].tolist()[0],2)), showarrow=False,row=row,col=column)
+
+			else:
+				fig.append_trace( go.Scatter(mode='markers', x=[], y=[],  opacity=0), row=row,col=column) 
+				fig.update_xaxes(visible=False, row = row, col = column)
+				fig.update_yaxes(visible=False, row = row, col = column)
+				fig.add_annotation(xref='x domain',yref='y domain',x=0.5,y=0.5, text='WM Lesion Segmentation Failed', font= dict(color='red'), showarrow=False,row=row,col=column)
+				print('WMLS Volume is missing (check if the WMLS nii file exist)')
 
 		else:
 
