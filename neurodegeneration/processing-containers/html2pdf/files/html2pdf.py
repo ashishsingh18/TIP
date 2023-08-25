@@ -132,7 +132,7 @@ def writeHtml(plots, tables, flagtable, dftable, outName, brainplot):#, wmlstabl
 				border-collapse: collapse;
   				table-layout: auto;
     			width: 100%;
-    			font-size:80%
+    			font-size:65%
 				}
 			th, td {
 				border: 1px solid black;

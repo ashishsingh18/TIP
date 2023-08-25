@@ -7,7 +7,7 @@ from datetime import datetime
 # For local testng
 # os.environ["WORKFLOW_DIR"] = "/sharedFolder/5datasets_F8F12F18M13M5/F8"
 # os.environ["BATCH_NAME"] = "batch"
-# os.environ["OPERATOR_OUT_DIR"] = "/sharedFolder/5datasets_F8F12F18M13M5/F8/output-html"
+# os.environ["OPERATOR_OUT_DIR"] = "/sharedFolder/5datasets_F8F12F18M13M5/F8/output-html-wo-wmls"
 # os.environ["OPERATOR_IN_DIR_QUANT"] = "roi-quantification"
 # os.environ["OPERATOR_IN_DIR_BIOMARKER"] = "normative-bio-visual-ouput2"
 # os.environ["OPERATOR_IN_DIR_BRAINVIS"] = "brain-visualize"
