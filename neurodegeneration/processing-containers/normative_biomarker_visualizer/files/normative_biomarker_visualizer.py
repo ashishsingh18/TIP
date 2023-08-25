@@ -205,6 +205,7 @@ def plotWithRef(dfRef, WMLSref, dfSub, fname, spareAD, spareBA):
 		setmin = setmin - spacer
 
 		if selVar == 'Total White Matter Hyperintensity Volume':
+			#### if total white matter hyperintensity volume is avaliable, then plot the reference line, patient dot, annotation
 			if dfSub[selVar].tolist()[0] != 0:
 				CN_up5 = [abs(int(i)-(int(dfSub['Age'].values[0])+3)) for i in XX_CN]
 				CN_down5 = [abs(int(i)-(int(dfSub['Age'].values[0])-3)) for i in XX_CN]
@@ -227,6 +228,7 @@ def plotWithRef(dfRef, WMLSref, dfSub, fname, spareAD, spareBA):
 				fig.append_trace( go.Scatter(mode='markers', x=dfSub.Age.tolist(), y=dfSub[selVar].tolist(), legendgroup='Patient', marker=dict(color='Black', symbol = 'circle-cross-open', size=16,line=dict(color='MediumPurple', width=3)), name='Patient', showlegend=sl),row,column)
 				fig.add_annotation(xref='x domain',yref='y domain',x=0.01,y=0.95, text='WMLS Volume (mL\u00b3): ' + str(round(dfSub[selVar].tolist()[0],2)), showarrow=False,row=row,col=column)
 
+			#### if total white matter hyperintensity volume is not available, then plot the text with "WM Lesion Segmentation Failed" and then print the statement
 			else:
 				fig.append_trace( go.Scatter(mode='markers', x=[], y=[],  opacity=0), row=row,col=column) 
 				fig.update_xaxes(visible=False, row = row, col = column)
