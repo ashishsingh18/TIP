@@ -8,13 +8,13 @@ import shutil
 import time
 
 #for testing
-os.environ["AWS_BATCH_JOB_ID"] = "A" #auto populated
-os.environ["JOB_INPUT_BUCKET"] = "from-kaapana"
-os.environ["JOB_INPUT_KEY"] = "T1/2.16.840.1.114362.1.12066432.24920037488.604832673.262.7184.nii.gz"
-os.environ["JOB_REQUESTED_BY_USER"] = "kaapana"
-os.environ['AWS_BATCH_JQ_NAME'] = "C" #auto populated
-os.environ['AWS_BATCH_CE_NAME'] = "D" #auto populated
-os.environ["AWS_SHARED_CREDENTIALS_FILE"] = "/sharedFolder/v2/credentials"
+# os.environ["AWS_BATCH_JOB_ID"] = "A" #auto populated
+# os.environ["JOB_INPUT_BUCKET"] = "from-kaapana"
+# os.environ["JOB_INPUT_KEY"] = "T1/2.16.840.1.114362.1.12066432.24920037488.604832673.262.7184.nii.gz"
+# os.environ["JOB_REQUESTED_BY_USER"] = "kaapana"
+# os.environ['AWS_BATCH_JQ_NAME'] = "C" #auto populated
+# os.environ['AWS_BATCH_CE_NAME'] = "D" #auto populated
+# os.environ["AWS_SHARED_CREDENTIALS_FILE"] = "/sharedFolder/v2/credentials"
 
 def get_metadata(bucket_name,object_key):
   s3 = boto3.client('s3')
