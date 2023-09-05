@@ -1,4 +1,4 @@
-FROM aidinisg/nichartpipelines:0.1.4
+FROM aidinisg/nichartpipelines:0.1.5
 
 RUN pip install boto3
 
