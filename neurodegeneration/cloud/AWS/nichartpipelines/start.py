@@ -3,14 +3,13 @@ import torch
 import sys
 import os
 import boto3
-#import SimpleITK as sitk
 import shutil
 import time
 
 #for testing
 # os.environ["AWS_BATCH_JOB_ID"] = "A" #auto populated
-# os.environ["JOB_INPUT_BUCKET"] = "from-kaapana"
-# os.environ["JOB_INPUT_KEY"] = "T1/2.16.840.1.114362.1.12066432.24920037488.604832673.262.7184.nii.gz"
+# os.environ["JOB_INPUT_BUCKET"] = "data-coming-from-kaapana-develop"
+# os.environ["JOB_INPUT_KEY"] = "Subject1_0000_0000.nii.gz"
 # os.environ["JOB_REQUESTED_BY_USER"] = "kaapana"
 # os.environ['AWS_BATCH_JQ_NAME'] = "C" #auto populated
 # os.environ['AWS_BATCH_CE_NAME'] = "D" #auto populated
@@ -29,14 +28,7 @@ def get_metadata(bucket_name,object_key):
 def runProcessing():
     print("Starting nnunet pipeline[dlicv->apply mask->muse->relabel]")
     os.makedirs(output_dir, exist_ok=True)
-    #version 1
-    # result = os.system("niCHARTPipelines -i /input/ -o /output/ " +
-    #        "-p structural -s 123 " +
-    #        "--derived_ROI_mappings_file /mappings/MUSE_mapping_derived_rois.csv " +
-    #        "--MUSE_ROI_mappings_file /mappings/MUSE_mapping_consecutive_indices.csv " +
-    #        " --results_folder /models")
 
-    #version 2
     result = os.system("niCHARTPipelines -i /input/ -o /output/ " +
         "-p structural " +
         "--derived_ROI_mappings_file /mappings/MUSE_mapping_derived_rois.csv " +
@@ -82,8 +74,6 @@ s3 = boto3.client('s3')
 os.makedirs("/input/", exist_ok=True)
 os.makedirs("/output/", exist_ok=True)
 
-#following won't work correctly if there are multiple folders in input_key,
-#but we won't specify multiple folders, so this should work for now
 #TODO: make this generic
 folder_name, file_name = os.path.split(input_key)
 print("folder name: ", folder_name, "file name: ", file_name)
