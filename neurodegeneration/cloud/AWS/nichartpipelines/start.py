@@ -3,17 +3,17 @@ import torch
 import sys
 import os
 import boto3
-#import SimpleITK as sitk
 import shutil
+import time
 
 #for testing
 # os.environ["AWS_BATCH_JOB_ID"] = "A" #auto populated
-# os.environ["JOB_INPUT_BUCKET"] = "from-kaapana"
-# os.environ["JOB_INPUT_KEY"] = "T1/Subjectc99cdb26803b4edfb757b2aa2c26084c1_0000_0000.nii.gz"
+# os.environ["JOB_INPUT_BUCKET"] = "data-coming-from-kaapana-develop"
+# os.environ["JOB_INPUT_KEY"] = "Subject1_0000_0000.nii.gz"
 # os.environ["JOB_REQUESTED_BY_USER"] = "kaapana"
 # os.environ['AWS_BATCH_JQ_NAME'] = "C" #auto populated
 # os.environ['AWS_BATCH_CE_NAME'] = "D" #auto populated
-# os.environ["AWS_SHARED_CREDENTIALS_FILE"] = "/sharedFolder/credentials"
+# os.environ["AWS_SHARED_CREDENTIALS_FILE"] = "/sharedFolder/v2/credentials"
 
 def get_metadata(bucket_name,object_key):
   s3 = boto3.client('s3')
@@ -28,16 +28,20 @@ def get_metadata(bucket_name,object_key):
 def runProcessing():
     print("Starting nnunet pipeline[dlicv->apply mask->muse->relabel]")
     os.makedirs(output_dir, exist_ok=True)
+
     result = os.system("niCHARTPipelines -i /input/ -o /output/ " +
-           "-p structural -s 123 " +
-           "--derived_ROI_mappings_file /mappings/MUSE_mapping_derived_rois.csv " +
-           "--MUSE_ROI_mappings_file /mappings/MUSE_mapping_consecutive_indices.csv " +
-           " --results_folder /models")
+        "-p structural " +
+        "--derived_ROI_mappings_file /mappings/MUSE_mapping_derived_rois.csv " +
+        "--MUSE_ROI_mappings_file /mappings/MUSE_mapping_consecutive_indices.csv " +
+        "--model_folder /models " +
+        "--all_in_gpu True --mode fastest --disable_tta")
+
     if result > 0:
         print("nnunet pipeline exited abnormally. Job failed.")
         sys.exit(1)
     print("nnunet pipeline succeeded.")
 
+st = time.time()
 # AWS Batch Vars
 print(f"Batch Job ID: { os.environ['AWS_BATCH_JOB_ID'] }")
 print(f"Batch Job Queue: { os.environ['AWS_BATCH_JQ_NAME'] }")
@@ -70,8 +74,6 @@ s3 = boto3.client('s3')
 os.makedirs("/input/", exist_ok=True)
 os.makedirs("/output/", exist_ok=True)
 
-#following won't work correctly if there are multiple folders in input_key,
-#but we won't specify multiple folders, so this should work for now
 #TODO: make this generic
 folder_name, file_name = os.path.split(input_key)
 print("folder name: ", folder_name, "file name: ", file_name)
@@ -125,3 +127,6 @@ except Exception as e:
 print("Object should be available in bucket " + out_bucket + " with object name " + object_name)
 print("Done.")
 
+et = time.time()
+elapsed_time = (et-st)/60 #mins
+print("Elapsed time in mins: ", elapsed_time)

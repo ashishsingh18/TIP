@@ -25,9 +25,9 @@ from subprocess import PIPE, run
 # os.environ["AWS_ACCESS_KEY"] = str(None)
 # os.environ["AWS_SECRET_KEY"] = str(None)
 # os.environ["S3_BUCKET_NAME"] = "to-kaapana"
-# os.environ['S3_OBJECT_NAME_PREFIX']= "T1/S"
+# os.environ['S3_OBJECT_NAME_PREFIX']= 'T1/Subject' #"dag-run-specific"
 # os.environ["S3_ACTION"] = 'get'
-# os.environ["S3_OBJECT_SERIES_UID"] = "2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607"
+# os.environ["S3_OBJECT_SERIES_UID"] = "2.16.840.1.114362.1.12066432.24920037488.604832115.605.168"
 # os.environ["S3_OBJECT_SERIES_DESCRIPTION"] = "T1"
 # os.environ["S3_OBJECT_GET_EXTENSION"]=".zip" #downloaded from S3 with this extension
 # os.environ["S3_OBJECT_PUT_SUFFIX"]="_0000_0000"
@@ -99,7 +99,11 @@ def read_image(input_file_path):
 
 def get_seriesuid(bucket_name,object_key):
   s3 = boto3.client('s3')
-  object_metadata = s3.head_object(Bucket=bucket_name, Key=object_key)['Metadata']
+  try:
+    object_metadata = s3.head_object(Bucket=bucket_name, Key=object_key)['Metadata']  
+  except ClientError as e:
+        print(e)
+        print(f'Error getting head object metadata- object: {object_key}, bucket: {bucket_name}.')
   seriesuid = object_metadata['seriesuid']
   print("series uid = ", seriesuid)
 
@@ -108,12 +112,22 @@ def retrieve_objectname_matching_uid(bucket_name, seruid):
     print("#####Entered retrieve object name matching uid#####")
     s3 = boto3.client('s3')
 
-    response = s3.list_objects(Bucket=bucket_name)
+    try:
+        response = s3.list_objects(Bucket=bucket_name)  
+    except ClientError as e:
+        print(e)
+        print(f'Error listing - bucket: {bucket_name}.')
+
     print("bucket name: ", bucket_name, "series uid: ", seruid)
     object_name = ""
     for content in response.get('Contents', []):
         object_key = content['Key']
-        object_metadata = s3.head_object(Bucket=bucket_name, Key=object_key)['Metadata']
+        print('object_key: ', object_key)
+        try:
+            object_metadata = s3.head_object(Bucket=bucket_name, Key=object_key)['Metadata']
+        except ClientError as e:
+            print(e)
+            print(f'Error getting head object metadata- object: {object_key}, bucket: {bucket_name}.')
         print("key: ", object_key, "object_metadata", object_metadata)
         if(object_metadata['seriesuid'] == seruid):
           print("found object with matchin series uid: ", object_key)
@@ -129,7 +143,11 @@ def list_files(bucket_name):
     print("bucket name: ", bucket_name)
     s3_client = boto3.client('s3')
 
-    objects = s3_client.list_objects_v2(Bucket=bucket_name)
+    try:
+        objects = s3_client.list_objects_v2(Bucket=bucket_name)
+    except ClientError as e:
+        print(e)
+        print(f'Error listing -  bucket: {bucket_name}.')
 
     for obj in objects['Contents']:
         print(obj['Key'])
@@ -163,6 +181,7 @@ def upload_file(file_name, bucket, uid,object_name=None):
         response = s3_client.upload_file(file_name, bucket, object_name,ExtraArgs={'Metadata': {'seriesuid': uid,'seriesdescription':series_description}})
     except ClientError as e:
         print(e)
+        print(f'Error uploading- file: {file_name}, object: {object_name}, bucket: {bucket_name}.')
         return False
     return True
 
@@ -181,6 +200,7 @@ def download_file(file_name,bucket_name,uid):
           response = s3.download_file(bucket_name, object_name, file_name)
     except ClientError as e:
         print(e)
+        print(f'Error downloading- file: {file_name}, object: {object_name}, bucket: {bucket_name}.')
         return False
     return True
 
@@ -193,6 +213,7 @@ def remove_object(bucket_name, object_name):
         response = s3_client.delete_object(Bucket=bucket_name,Key=object_name)
     except ClientError as e:
         print(e)
+        print(f'Error removing- object: {object_name}, bucket: {bucket_name}.')
 
 def remove_all_objects(bucket_name):
     print("######Entered remove_all_objects########")
@@ -206,7 +227,11 @@ def empty_bucket(bucket_name):
     print("######Entered empty_bucket#######")
     print("bucket name: ", bucket_name)
     s3 = boto3.resource('s3')
-    s3.Bucket(bucket_name).objects.delete()
+    try:
+        s3.Bucket(bucket_name).objects.delete()
+    except s3.meta.client.exceptions as e:
+        print(e)
+        print(f'Error emptying - bucket: {bucket_name}.')
     
 workflow_dir = getenv("WORKFLOW_DIR", "None")
 workflow_dir = workflow_dir if workflow_dir.lower() != "none" else None
@@ -287,11 +312,13 @@ for batch_element_dir in batch_folders:
         print(f'Applying action "{s3_action}" to files {input_file} in S3 bucket "{s3_bucket_name}"')
         if(s3_action == 'list'):
             list_files(s3_bucket_name)
-            print("list files done")
+            print("list files in s3 bucket done")
+            processed_count += 1
         
         if(s3_action == 'put'):#upload file to S3
             upload_file(input_file,s3_bucket_name,uid,s3_object_name)
             print('upload to S3 bucket done.')
+            processed_count += 1
 
         if(s3_action == 'get'):
             #output_file_path = os.path.join(element_output_dir, "{}.nii.gz".format(os.path.basename(batch_element_dir)))
@@ -300,16 +327,22 @@ for batch_element_dir in batch_folders:
             print("output_file_path: ",output_file_path)
             download_file(output_file_path,s3_bucket_name,uid)
             print("download from S3 bucket done.")
+            processed_count += 1
 
         if(s3_action == 'remove'):
             if((s3_object_name_prefix == 'None') or (s3_object_name_prefix == '*.*')): #remove all objects from bucket
                 #remove_all_objects(s3_bucket_name)
                 empty_bucket(s3_bucket_name)
-            else:#remove specified object from bucket
-                remove_object(s3_bucket_name,s3_object_name_prefix)
-            print("delete from S3 bucket done.")
+            elif(s3_object_name_prefix == 'dag-run-specific'):#remove object specific to the current run of dag
+                object_name = retrieve_objectname_matching_uid(s3_bucket_name,uid)
+                if(object_name == ""):
+                    print("object not found!")
+                else:
+                    print("object name: ", object_name)
+                    remove_object(s3_bucket_name,object_name)
+            print("remove from S3 bucket done.")
+            processed_count += 1
 
-        processed_count += 1
 
 print("#")
 print("##################################################")
