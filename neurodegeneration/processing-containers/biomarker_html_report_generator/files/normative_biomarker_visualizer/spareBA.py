@@ -18,10 +18,10 @@ import os as _os
 
 from joblib import dump, load
 
-from boxoffplot import WMHbox
+from .boxoffplot import WMHbox
 
 def calculateSpareBA(age,sex,test):
-	MUSE_Ref_Values = pd.read_csv('/refs/combinedharmonized_out.csv')
+	MUSE_Ref_Values = pd.read_csv('../refs/combinedharmonized_out.csv')
 
 	MUSE_Ref_Values['Date'] = pd.to_datetime(MUSE_Ref_Values.Date)
 
