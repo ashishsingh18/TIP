@@ -20,7 +20,7 @@ from joblib import dump, load
 
 # TODO: Add PMC to reference values
 def calculateSpareAD(age,sex,test):
-	MUSE_Ref_Values = pd.read_csv('/refs/combinedharmonized_out.csv')
+	MUSE_Ref_Values = pd.read_csv('../refs/combinedharmonized_out.csv')
 
 	MUSE_Ref_Values.drop('SPARE_AD',axis=1,inplace=True)
 
