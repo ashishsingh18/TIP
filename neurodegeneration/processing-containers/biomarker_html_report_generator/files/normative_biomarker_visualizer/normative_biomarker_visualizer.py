@@ -17,10 +17,12 @@ from plotly.subplots import make_subplots
 
 import nrrd
 
-from spareAD import createSpareADplot
-from spareBA import createSpareBAplot
+from .spareAD import createSpareADplot
+from .spareBA import createSpareBAplot
 
-from createcmap import get_continuous_cmap
+from .createcmap import get_continuous_cmap
+
+
 
 # Custom AI Z-score coloring scheme
 def tagAI_ID(num):
@@ -284,7 +286,7 @@ def plotWithRef(dfRef, WMLSref, dfSub, fname, spareAD, spareBA):
 
 # TODO: 
 def makeFlagTablePKL(dfRef,mydict,MUSErois,path):
-	maphemi = pd.read_csv('/refs/MUSE_ROI_Dictionary.csv')
+	maphemi = pd.read_csv('../refs/MUSE_ROI_Dictionary.csv')
 	all_entries = ""
 
 	# Identify L and R pairs of single ROIs
@@ -384,7 +386,7 @@ def makeFlagTablePKL(dfRef,mydict,MUSErois,path):
 	with open(path, 'wb') as f:
 		pickle.dump(string, f)
 
-def _main(dfSub, dfRef, WMLSref, allz_num, allz, all_MuseROIs_name, spareAD, spareBA, pdf_path):
+def biomarker_main(dfSub, dfRef, WMLSref, allz_num, allz, all_MuseROIs_name, spareAD, spareBA, pdf_path):
 	UID = _os.path.basename(pdf_path.removesuffix(".pdf"))
 	out = _os.path.dirname(pdf_path)
 
