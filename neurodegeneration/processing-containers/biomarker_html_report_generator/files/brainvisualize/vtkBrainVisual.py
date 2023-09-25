@@ -357,7 +357,7 @@ def setup_vtk_pipeline(roi,allz_num,out):
 	iren = vtk.vtkRenderWindowInteractor()
 	iren.SetRenderWindow(rw)
 
-	#rw.SetOffScreenRendering(1)
+	rw.SetOffScreenRendering(1)
  
 	# Define 8 viewports
 	viewport_positions = {}
@@ -434,7 +434,7 @@ def setup_vtk_pipeline(roi,allz_num,out):
 	fname= out +'_finalvis.png'
 	save_screeenshot(rw,fname)
 
-	iren.Start()
+	#iren.Start()
 
 
 def read_itk_image(input_file_path):
