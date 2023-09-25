@@ -59,7 +59,7 @@ def main(muse_roi, dlicv_mask,  wmls_mask, dcm_json):
     # dfSub = pd.read_pickle('./tmp/tmp_dfSub.pkl')
     # dfRef = pd.read_pickle('./tmp/tmp_dfRef.pkl')
     # WMLSref = pd.read_pickle('./tmp/tmp_WMLSref.pkl')
-    # allz_num = pd.read_pickle('./tmp/tmp_allz_num.pkl')
+    allz_num = pd.read_pickle('./tmp/tmp_allz_num.pkl')
     # allz = pd.read_pickle('./tmp/tmp_allz.pkl')
     # all_MuseROIs_name = pd.read_pickle('./tmp/tmp_all_MuseROIs_name.pkl')
     # spareAD = pd.read_pickle('./tmp/tmp_spareAD.pkl')
@@ -69,7 +69,7 @@ def main(muse_roi, dlicv_mask,  wmls_mask, dcm_json):
     
     ############################ Brain Visualize ########################################################
     
-    #brainvisual_main(roi[0], allz_num, './tmp/tmp.pdf')
+    brainvisual_main(muse_roi[0], allz_num, './tmp/tmp.pdf')
 
 
     ############################ CVS Extraction #########################################################
@@ -78,14 +78,14 @@ def main(muse_roi, dlicv_mask,  wmls_mask, dcm_json):
     
     ############################ html extraction ########################################################
     
-    dfPat = pd.read_pickle('./tmp/tmp_dfPat.pkl')
-    table = pd.read_pickle('./tmp/tmp_roisubsettable.pkl')
-    flagtable = pd.read_pickle('./tmp/tmp_flagtable.pkl')
+    # dfPat = pd.read_pickle('./tmp/tmp_dfPat.pkl')
+    # table = pd.read_pickle('./tmp/tmp_roisubsettable.pkl')
+    # flagtable = pd.read_pickle('./tmp/tmp_flagtable.pkl')
 
-    absolute_path = os.path.abspath(os.getcwd())
+    # absolute_path = os.path.abspath(os.getcwd())
 
-    pdf_path = absolute_path + '/tmp/tmp.pdf'
-    html_main(pdf_path, dfPat, table, flagtable)
+    # pdf_path = absolute_path + '/tmp/tmp.pdf'
+    # html_main(pdf_path, dfPat, table, flagtable)
 
     #output is a single html file + all files required by csv_extraction container
     
