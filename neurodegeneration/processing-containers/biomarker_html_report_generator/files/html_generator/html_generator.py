@@ -210,7 +210,7 @@ def writeHtml(plots, tables, flagtable, dftable, outName, brainplot):#, wmlstabl
     print('here')
 
 
-def _main(pdf_path,dfPat, tables, flagtable):
+def _main(pdf_path, dfPat, tables, flagtable):
     UID = str(_os.path.basename(pdf_path.removesuffix(".pdf")))
     pdf_out = str(_os.path.dirname(pdf_path))
     print('pdf_out', pdf_out)
