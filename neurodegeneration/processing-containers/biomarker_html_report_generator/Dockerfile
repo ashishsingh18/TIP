@@ -9,8 +9,9 @@ RUN apt-get -y install libcairo2 libpango-1.0-0 libpangocairo-1.0-0 libgdk-pixbu
 
 COPY requirements.txt ./
 RUN pip install -r requirements.txt
-
 RUN mkdir /src 
+RUN cd files/spare_score
+RUN pip install .
 
 COPY files/normative_biomarker_visualizer.py /src
 COPY files/reportdriver_normative_biomarker_visualizer.py /src
