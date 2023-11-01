@@ -6,16 +6,17 @@ import nibabel as nib
 from datetime import datetime
 import csv as _csv
 import os as _os
-  
+import copy
+
 #### Hardcoded reference data ###
 # Harmonized reference MUSE values #
-MUSE_Ref_Values = '../refs/combinedharmonized_out.csv'
+MUSE_Ref_Values = '/refs/combinedharmonized_out.csv'
 # Left and Right ROIs indices as well as ROI name to ROI number equivalency #
-maphemi = pd.read_csv('../refs/MUSE_ROI_Dictionary.csv')
+maphemi = pd.read_csv('/refs/MUSE_ROI_Dictionary.csv')
 # Single ROI to combined ROI mapping #
-MUSE_ROI_Mapping = '../refs/MUSE_DerivedROIs_Mappings.csv'
+MUSE_ROI_Mapping = '/refs/MUSE_DerivedROIs_Mappings.csv'
 # Harmonized reference WMLS values #
-WMLS_Ref_Values = '../refs/WMLS_combinedrefs.csv'
+WMLS_Ref_Values = '/refs/WMLS_combinedrefs.csv'
 
 ################################################ FUNCTIONS ################################################
 
@@ -60,9 +61,8 @@ def calcMaskVolume(maskfile):
 	
 	### Check input mask
 	if not maskfile:
-		print("ERROR: Input file not provided!!!")
-		sys.exit(0) 
-
+		raise Exception('Input file not provided!!!')
+		
 	### Read the input image
 	roinii = nib.load(maskfile)
 	roiimg = roinii.get_fdata()
@@ -81,8 +81,7 @@ def calcRoiVolumes(maskfile, mapcsv, dfRef, subDict):
 	
 	### Check input mask
 	if not maskfile:
-		print("ERROR: Input file not provided!!!")
-		sys.exit(0) 
+		raise Exception('ERROR: Input file not provided!!!')
 
 	### Read the input image
 	roinii = nib.load(maskfile)
@@ -288,36 +287,12 @@ def ICVAdjust(dfSub, dfRef,WMLSref,all_MuseROIs_num,all_MuseROIs_name):
 
 	return dfSub, dfRef, WMLSref, all_MuseROIs_num, all_MuseROIs_name
 
-### Function scales down all ROIs by 1000 ###
-def nonICVAdjust(dfSub,dfRef,WMLSref,all_MuseROIs_num,all_MuseROIs_name):
-	nonROI = list(dfSub.columns[dfSub.columns.str.contains('AI')].values)
-	nonROI.extend(['MRID','Age','Sex'])
-
-	# Convert from mm^3 to cm^3
-	dfSub[dfSub.columns.difference(nonROI)] = dfSub[dfSub.columns.difference(nonROI)]/1000
-	all_MuseROIs_num = {key: value / 1000 for key, value in all_MuseROIs_num.items()}
-	all_MuseROIs_name = {key: value / 1000 for key, value in all_MuseROIs_name.items()}
-	# make 702 into None value
-	all_MuseROIs_num['702'] = None
-
-	nonROI = list(dfRef.columns[dfRef.columns.str.contains('AI')].values)
-	nonROI.extend(['MRID','Study','PTID','Age','Sex','Diagnosis_nearest_2.0','SITE','Date','SPARE_AD','SPARE_BA'])
-
-	# Convert from mm^3 to cm^3
-	dfRef[dfRef.columns.difference(nonROI)] = dfRef[dfRef.columns.difference(nonROI)]/1000
-
-	nonROI = ['ID','Phase','PTID','Age','Sex','Diagnosis_nearest_2.0','Date','ICV']
-	# Convert from mm^3 to cm^3
-	WMLSref[WMLSref.columns.difference(nonROI)] = WMLSref[WMLSref.columns.difference(nonROI)]/1000
-
-	return dfSub, dfRef, WMLSref, all_MuseROIs_num, all_MuseROIs_name
 
 ############## MAIN ##############
-#DEF
 def roi_quantifier_main(roi, icv, wmls, _json, out_path):
 	UID = _os.path.basename(out_path.removesuffix(".pdf"))
-	##########################################################################
-	##### Read and initial filter for reference ROI values
+ 
+	##### Read and initial filter for reference ROI values###################
 	dfRef = pd.read_csv(MUSE_Ref_Values).dropna()
 	out = _os.path.dirname(out_path)
 	dfRef['Date'] = pd.to_datetime(dfRef.Date)
@@ -328,10 +303,9 @@ def roi_quantifier_main(roi, icv, wmls, _json, out_path):
 	dfRef['Sex'].replace(0, 'F',inplace=True)
 	dfRef['Sex'].replace(1, 'M',inplace=True)
 
-	##########################################################################
-	##### Read subject data (demog and MRI)
 
-	####################################
+	###########Read subject data (demog and MRI)#############################
+
 	## Read subject/scan info
 	subDict = readSubjInfo(_json)
 
@@ -352,7 +326,7 @@ def roi_quantifier_main(roi, icv, wmls, _json, out_path):
 	# same sex selection - all work with dfRef onwards is based on same sex
 	dfRef = dfRef[dfRef.Sex == dfSub.loc[0,'Sex']]
 
-	## Read icv, if provided
+	## Read icv, if provided, calculate icv and stored it on the subject
 	icvVol = None
 	dfSub['ICV'] = None
 	if len(icv) == 1:
@@ -361,6 +335,7 @@ def roi_quantifier_main(roi, icv, wmls, _json, out_path):
 
 	# Obtain foundational objects for after this container
 	roiVols, dfRef, allz, allz_num, all_MuseROIs_num, all_MuseROIs_name = calcRoiVolumes(roi[0], MUSE_ROI_Mapping, dfRef, subDict)
+ 
 	# Add subject MUSE volumes to 
 	for key in roiVols.keys():
 		dfSub.loc[0, key] = roiVols[key]
@@ -375,7 +350,7 @@ def roi_quantifier_main(roi, icv, wmls, _json, out_path):
 	dfSub['Total White Matter Hyperintensity Volume'] = wmlsVol
 
 	### Add WMLS 604 reference datapoints to dfRef ###
-	WMLSref = pd.read_csv('../refs/WMLS_combinedrefs.csv').dropna()
+	WMLSref = pd.read_csv(WMLS_Ref_Values).dropna()
 	WMLSref['Date'] = pd.to_datetime(WMLSref.Date)
 	WMLSref = WMLSref.sort_values(by='Date')
 	# Get first-time points only
@@ -387,12 +362,14 @@ def roi_quantifier_main(roi, icv, wmls, _json, out_path):
 	WMLSref = WMLSref[WMLSref.Sex == dfSub.loc[0,'Sex']]
 	# Rename 604 to Total White Matter Hyperintensity Volume
 	WMLSref.rename(columns={'604':'Total White Matter Hyperintensity Volume'}, inplace=True)
+ 
+	Muse_ROI = copy.deepcopy(all_MuseROIs_num)
 
 	# ICV-adjust only if ICV is available - in final version, we should throw an error and stop the pipeline
 	if dfSub.loc[0,'ICV'] is not None:
 		dfSub, dfRef, WMLSref, all_MuseROIs_num, all_MuseROIs_name = ICVAdjust(dfSub,dfRef,WMLSref,all_MuseROIs_num,all_MuseROIs_name)
 	else:
-		dfSub, dfRef, WMLSref, all_MuseROIs_num, all_MuseROIs_name = nonICVAdjust(dfSub,dfRef,WMLSref,all_MuseROIs_num,all_MuseROIs_name)
+		raise Exception('Sorry, ICV volume is not calculated. Check the ICV nii.gz file.')
 
 	# Define which directory to save to
 	out = _os.path.dirname(out_path)
@@ -414,25 +391,11 @@ def roi_quantifier_main(roi, icv, wmls, _json, out_path):
 		pickle.dump(all_MuseROIs_num,pickle_file)
 	with open(_os.path.join(out,UID+'_all_MuseROIs_name.pkl'), 'wb') as pickle_file:
 		pickle.dump(all_MuseROIs_name,pickle_file)
+  
+	with open(_os.path.join(out,UID+'_MuseROIs_NoICVCorrection.pkl'), 'wb') as pickle_file:
+		pickle.dump(Muse_ROI,pickle_file)
 
-	return dfSub, dfRef, WMLSref, dfPat, allz_num, allz, all_MuseROIs_num, all_MuseROIs_name
+	return dfSub, dfRef, WMLSref, dfPat, allz_num, allz, all_MuseROIs_num, all_MuseROIs_name, Muse_ROI
 
-####### Local Test ##############
-
-# if __name__ == '__main__':
-    
-#     roi = ['/home/diwu/Desktop/kaapana-data-to-check-brainviz/F1/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168/relabel/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168.nii.gz']
-#     # icv = '/home/diwu/Desktop/kaapana-data-to-check-brainviz/kaapana_Seis/2.16.840.1.114362.1.12035716.24525521429.585200304.999.1428/dlicv-inference/2.16.840.1.114362.1.12035716.24525521429.585200304.999.1428.nrrd'
-#     # wmls = '/home/diwu/Desktop/kaapana-data-to-check-brainviz/kaapana_Seis/2.16.840.1.114362.1.12035716.24525521429.585200304.999.1428/wmls/2.16.840.1.114362.1.12035716.24525521429.585200304.999.1428.nrrd'
-    
-#     # sitk.WriteImage(sitk.ReadImage(icv), '/home/diwu/Desktop/kaapana-data-to-check-brainviz/kaapana_Seis/2.16.840.1.114362.1.12035716.24525521429.585200304.999.1428/dlicv-inference/2.16.840.1.114362.1.12035716.24525521429.585200304.999.1428.nii.gz')
-#     # sitk.WriteImage(sitk.ReadImage(wmls), '/home/diwu/Desktop/kaapana-data-to-check-brainviz/kaapana_Seis/2.16.840.1.114362.1.12035716.24525521429.585200304.999.1428/wmls/2.16.840.1.114362.1.12035716.24525521429.585200304.999.1428.nii.gz')
-    
-#     icv = ['/home/diwu/Desktop/kaapana-data-to-check-brainviz/F1/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168/dlicv-inference/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168.nii.gz']
-#     wmls = ['/home/diwu/Desktop/kaapana-data-to-check-brainviz/F1/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168/wmls/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168.nii.gz']
-    
-#     _json = '/home/diwu/Desktop/kaapana-data-to-check-brainviz/F1/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168/GetT1Metadata/2.16.840.1.114362.1.12066432.24920037488.604832115.605.168.json'
-#     out_path = '/home/diwu/Desktop/2.pdf'
-#     _main(roi, icv, wmls, _json, out_path)
     
     
