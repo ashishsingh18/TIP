@@ -16,7 +16,7 @@ import os as _os
 ### Function to train and test model to calculate SPARE-AD score for subject
 def calculateSpareAD(age,sex,test):
 	# Read in reference values
-	MUSE_Ref_Values = pd.read_csv('/refs/combinedharmonized_out.csv')
+	MUSE_Ref_Values = pd.read_csv('../refs/combinedharmonized_out.csv')
 	MUSE_Ref_Values.drop('SPARE_AD',axis=1,inplace=True)
 	# Select first timepoint only
 	MUSE_Ref_Values['Date'] = pd.to_datetime(MUSE_Ref_Values.Date)
@@ -82,7 +82,7 @@ def calculateSpareAD(age,sex,test):
 
 def calculateSpareBA(age,sex,test):
 	# Read in reference values
-	MUSE_Ref_Values = pd.read_csv('/refs/combinedharmonized_out.csv')
+	MUSE_Ref_Values = pd.read_csv('../refs/combinedharmonized_out.csv')
 	# Select first timepoint only
 	MUSE_Ref_Values['Date'] = pd.to_datetime(MUSE_Ref_Values.Date)
 	MUSE_Ref_Values = MUSE_Ref_Values.sort_values(by='Date')
@@ -145,7 +145,7 @@ def calculateSpareBA(age,sex,test):
 	return predictions_MUSE_Ref_Values
 
 # Main function that decides order in which functions run in this script
-def _main(dfSub,all_MuseROIs_num,out_path):
+def spare_main(dfSub,all_MuseROIs_num,out_path):
 	UID = _os.path.basename(out_path.removesuffix(".pdf"))
 	spareAD = calculateSpareAD(dfSub.loc[0,'Age'],dfSub.loc[0,'Sex'],all_MuseROIs_num)
 	spareBA = calculateSpareBA(dfSub.loc[0,'Age'],dfSub.loc[0,'Sex'],all_MuseROIs_num)
@@ -157,3 +157,5 @@ def _main(dfSub,all_MuseROIs_num,out_path):
 		pickle.dump(spareAD,pickle_file)
 	with open(_os.path.join(out,UID+'_spareBA.pkl'), 'wb') as pickle_file:
 		pickle.dump(spareBA,pickle_file)
+  
+	return spareAD, spareBA

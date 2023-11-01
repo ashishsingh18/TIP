@@ -9,13 +9,13 @@ import os as _os
   
 #### Hardcoded reference data ###
 # Harmonized reference MUSE values #
-MUSE_Ref_Values = '/refs/combinedharmonized_out.csv'
+MUSE_Ref_Values = '../refs/combinedharmonized_out.csv'
 # Left and Right ROIs indices as well as ROI name to ROI number equivalency #
-maphemi = pd.read_csv('/refs/MUSE_ROI_Dictionary.csv')
+maphemi = pd.read_csv('../refs/MUSE_ROI_Dictionary.csv')
 # Single ROI to combined ROI mapping #
-MUSE_ROI_Mapping = '/refs/MUSE_DerivedROIs_Mappings.csv'
+MUSE_ROI_Mapping = '../refs/MUSE_DerivedROIs_Mappings.csv'
 # Harmonized reference WMLS values #
-WMLS_Ref_Values = '/refs/WMLS_combinedrefs.csv'
+WMLS_Ref_Values = '../refs/WMLS_combinedrefs.csv'
 
 ################################################ FUNCTIONS ################################################
 
@@ -314,7 +314,7 @@ def nonICVAdjust(dfSub,dfRef,WMLSref,all_MuseROIs_num,all_MuseROIs_name):
 
 ############## MAIN ##############
 #DEF
-def _main(roi, icv, wmls, _json, out_path):
+def roi_quantifier_main(roi, icv, wmls, _json, out_path):
 	UID = _os.path.basename(out_path.removesuffix(".pdf"))
 	##########################################################################
 	##### Read and initial filter for reference ROI values
@@ -375,7 +375,7 @@ def _main(roi, icv, wmls, _json, out_path):
 	dfSub['Total White Matter Hyperintensity Volume'] = wmlsVol
 
 	### Add WMLS 604 reference datapoints to dfRef ###
-	WMLSref = pd.read_csv('/refs/WMLS_combinedrefs.csv').dropna()
+	WMLSref = pd.read_csv('../refs/WMLS_combinedrefs.csv').dropna()
 	WMLSref['Date'] = pd.to_datetime(WMLSref.Date)
 	WMLSref = WMLSref.sort_values(by='Date')
 	# Get first-time points only
@@ -415,6 +415,7 @@ def _main(roi, icv, wmls, _json, out_path):
 	with open(_os.path.join(out,UID+'_all_MuseROIs_name.pkl'), 'wb') as pickle_file:
 		pickle.dump(all_MuseROIs_name,pickle_file)
 
+	return dfSub, dfRef, WMLSref, dfPat, allz_num, allz, all_MuseROIs_num, all_MuseROIs_name
 
 ####### Local Test ##############
 

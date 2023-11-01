@@ -17,10 +17,12 @@ from plotly.subplots import make_subplots
 
 import nrrd
 
-from spareAD import createSpareADplot
-from spareBA import createSpareBAplot
+from .spareAD import createSpareADplot
+from .spareBA import createSpareBAplot
 
-from createcmap import get_continuous_cmap
+from .createcmap import get_continuous_cmap
+
+
 
 # Custom AI Z-score coloring scheme
 def tagAI_ID(num):
@@ -94,6 +96,8 @@ def makeTablePKL(dfRef,dfSub,path):
 
 	with open(path, 'wb') as f:
 		pickle.dump(string, f)
+  
+	return string
 
 def plotWithRef(dfRef, WMLSref, dfSub, fname, spareAD, spareBA):
 	selVarlst = ['Total Brain Volume','Total Ventricle Volume','Total Gray Matter Volume',
@@ -284,7 +288,7 @@ def plotWithRef(dfRef, WMLSref, dfSub, fname, spareAD, spareBA):
 
 # TODO: 
 def makeFlagTablePKL(dfRef,mydict,MUSErois,path):
-	maphemi = pd.read_csv('/refs/MUSE_ROI_Dictionary.csv')
+	maphemi = pd.read_csv('../refs/MUSE_ROI_Dictionary.csv')
 	all_entries = ""
 
 	# Identify L and R pairs of single ROIs
@@ -383,33 +387,17 @@ def makeFlagTablePKL(dfRef,mydict,MUSErois,path):
 
 	with open(path, 'wb') as f:
 		pickle.dump(string, f)
+  
+	return string
 
-def _main(dfSub, dfRef, WMLSref, allz_num, allz, all_MuseROIs_name, spareAD, spareBA, pdf_path):
+def biomarker_main(dfSub, dfRef, WMLSref, allz_num, allz, all_MuseROIs_name, spareAD, spareBA, pdf_path):
 	UID = _os.path.basename(pdf_path.removesuffix(".pdf"))
 	out = _os.path.dirname(pdf_path)
 
-	makeTablePKL(dfRef,dfSub,_os.path.join(out,UID+'_roisubsettable.pkl'))
+	roisubsettable = makeTablePKL(dfRef,dfSub,_os.path.join(out,UID+'_roisubsettable.pkl'))
 	plotWithRef(dfRef,WMLSref, dfSub, _os.path.join(out,UID+'_plot.png'), spareAD[0], spareBA[0])
-	makeFlagTablePKL(dfRef,allz,all_MuseROIs_name,_os.path.join(out,UID+'_flagtable.pkl'))
+	flagtable = makeFlagTablePKL(dfRef,allz,all_MuseROIs_name,_os.path.join(out,UID+'_flagtable.pkl'))
  
+	return roisubsettable, flagtable
 
-# #### This is for local testing ######
-# if __name__ == "__main__":
-#     dfRef = pd.read_pickle('/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/roi-quantification/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607_dfRef.pkl')
-#     dfSub = pd.read_pickle('/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/roi-quantification/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607_dfSub.pkl')
-#     WMLSref = pd.read_pickle('/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/roi-quantification/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607_WMLSref.pkl')
-#     allz_num = pd.read_pickle('/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/roi-quantification/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607_allz_num.pkl')
-#     allz = pd.read_pickle('/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/roi-quantification/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607_allz.pkl')
-#     all_MuseROIs_name = pd.read_pickle('/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/roi-quantification/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607_all_MuseROIs_name.pkl')
-    
-#     # dfRef = pd.read_pickle('/home/diwu/Desktop/2_dfRef.pkl')
-#     # dfSub = pd.read_pickle('/home/diwu/Desktop/2_dfSub.pkl')
-#     # WMLSref = pd.read_pickle('/home/diwu/Desktop/2_WMLSref.pkl')
-#     # allz_num = pd.read_pickle('/home/diwu/Desktop/2_allz_num.pkl')
-#     # allz = pd.read_pickle('/home/diwu/Desktop/2_allz.pkl')
-#     # all_MuseROIs_name = pd.read_pickle('/home/diwu/Desktop/2_all_MuseROIs_name.pkl')
-#     spareAD = pd.read_pickle('/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/spare-calculation/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607_spareAD.pkl')
-#     spareBA = pd.read_pickle('/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/spare-calculation/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607_spareBA.pkl')
-#     pdf_path = '/home/diwu/Desktop/F2.pdf'
-    
-#     _main(dfSub, dfRef, WMLSref, allz_num, allz, all_MuseROIs_name, spareAD, spareBA, pdf_path)
+ 

@@ -115,6 +115,8 @@ MUSE_Volume_192,192,SINGLE,Right supplementary motor cortex,6368.8,R,GM,Frontal,
 MUSE_Volume_193,193,SINGLE,Left supplementary motor cortex,6723.3,L,GM,Frontal,Frontal_GM,Frontal_MEDIAL_GM,32
 MUSE_Volume_204,204,SINGLE,Right triangular part of the inferior frontal gyrus,4522.4,R,GM,Frontal,Frontal_GM,Frontal_LATERAL_GM,26
 MUSE_Volume_205,205,SINGLE,Left triangular part of the inferior frontal gyrus,5256.2,L,GM,Frontal,Frontal_GM,Frontal_LATERAL_GM,26
+MUSE_Volume_23,23,SINGLE,Right accumbens area,526,R,GM,Deep Nuclei,BASAL_GANGLIA,BASAL_GANGLIA,3
+MUSE_Volume_30,30,SINGLE,Left accumbens area,585.9,L,GM,Deep Nuclei,BASAL_GANGLIA,BASAL_GANGLIA,3
 MUSE_Volume_31,31,SINGLE,Right amygdala,1021.3,R,GM,Deep Nuclei,Right Amygdala,Right Amygdala,11
 MUSE_Volume_32,32,SINGLE,Left amygdala,993.7,L,GM,Deep Nuclei,Left Amygdala,Left Amygdala,11
 MUSE_Volume_36,36,SINGLE,Right caudate,3651.5,R,GM,Deep Nuclei,BASAL_GANGLIA,BASAL_GANGLIA,4
@@ -127,6 +129,10 @@ MUSE_Volume_57,57,SINGLE,Right putamen,4726,R,GM,Deep Nuclei,BASAL_GANGLIA,BASAL
 MUSE_Volume_58,58,SINGLE,Left putamen,4942.3,L,GM,Deep Nuclei,BASAL_GANGLIA,BASAL_GANGLIA,6
 MUSE_Volume_59,59,SINGLE,Right thalamus proper,8256.3,R,GM,Deep Nuclei,DEEP_GM,DEEP_GM,7
 MUSE_Volume_60,60,SINGLE,Left thalamus proper,8574.1,L,GM,Deep Nuclei,DEEP_GM,DEEP_GM,7
+MUSE_Volume_75,75,SINGLE,Left basal forebrain,586.5,L,GM,Deep Nuclei,Left Basal Forebrain,Left Basal Forebrain,12
+MUSE_Volume_76,76,SINGLE,Right basal forebrain,593.1,R,GM,Deep Nuclei,Right Basal Forebrain,Right Basal Forebrain,12
+MUSE_Volume_89,89,SINGLE,Right fornix,517.5,R,WM,Deep White,DEEP_WM,DEEP_WM,9
+MUSE_Volume_90,90,SINGLE,Left fornix,673.6,L,WM,Deep White,DEEP_WM,DEEP_WM,9
 MUSE_Volume_91,91,SINGLE,Right anterior limb of internal capsule,3393.3,R,WM,Deep White,DEEP_WM,DEEP_WM,8
 MUSE_Volume_92,92,SINGLE,Left anterior limb of internal capsule,2887.7,L,WM,Deep White,DEEP_WM,DEEP_WM,8
 MUSE_Volume_93,93,SINGLE,Right posterior limb of internal capsule (incl. cerebral peduncle),2480.5,R,WM,Deep White,DEEP_WM,DEEP_WM,10

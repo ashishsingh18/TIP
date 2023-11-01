@@ -87,7 +87,7 @@ def hex_to_rgb(hex: str):
 
 def add_scalarbar(renderer):
  
-	image_path = '/refs/colorbar.png'
+	image_path = '../refs/colorbar.png'
 	image_reader = vtk.vtkPNGReader()
 	image_reader.SetFileName(image_path)
 	image_reader.Update()
@@ -434,7 +434,7 @@ def setup_vtk_pipeline(roi,allz_num,out):
 	fname= out +'_finalvis.png'
 	save_screeenshot(rw,fname)
 
-	iren.Start()
+	#iren.Start()
 
 
 def read_itk_image(input_file_path):
