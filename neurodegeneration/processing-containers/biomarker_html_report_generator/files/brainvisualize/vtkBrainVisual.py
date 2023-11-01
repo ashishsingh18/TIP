@@ -87,7 +87,7 @@ def hex_to_rgb(hex: str):
 
 def add_scalarbar(renderer):
  
-	image_path = '../refs/colorbar.png'
+	image_path = '/refs/colorbar.png'
 	image_reader = vtk.vtkPNGReader()
 	image_reader.SetFileName(image_path)
 	image_reader.Update()
