@@ -2,6 +2,7 @@ import sys, os
 import glob
 import json
 import roi_quantifier
+import main as main
 from datetime import datetime
 
 # For local testng
