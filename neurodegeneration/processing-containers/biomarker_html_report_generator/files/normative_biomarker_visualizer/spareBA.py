@@ -1,87 +1,10 @@
 import pandas as pd
 import numpy as np
-import nrrd
-from sklearn.linear_model import LinearRegression
-from sklearn import preprocessing
-from sklearn.linear_model import Ridge
-from sklearn import metrics
-from sklearn.base import clone
-from sklearn import svm
-from sklearn.model_selection import KFold
-from sklearn.metrics import confusion_matrix
-
 import plotly.graph_objects as go
 from pygam import ExpectileGAM
-from pygam.datasets import mcycle
-from pygam import LinearGAM
-import os as _os
 
-from joblib import dump, load
 
 from .boxoffplot import WMHbox
-
-def calculateSpareBA(age,sex,test):
-	MUSE_Ref_Values = pd.read_csv('../refs/combinedharmonized_out.csv')
-
-	MUSE_Ref_Values['Date'] = pd.to_datetime(MUSE_Ref_Values.Date)
-
-	MUSE_Ref_Values = MUSE_Ref_Values.sort_values(by='Date')
-	MUSE_Ref_Values_hc = MUSE_Ref_Values.drop_duplicates(subset=['PTID'], keep='first')
-	MUSE_Ref_Values_pt = MUSE_Ref_Values[~MUSE_Ref_Values.isin(MUSE_Ref_Values_hc)].dropna()
-
-	MUSE_Ref_Values = MUSE_Ref_Values.drop(['MRID','Study','PTID','SITE','Date', 'SPARE_AD', 'Diagnosis_nearest_2.0'], axis=1, inplace=False)
-
-	# Make dataframe from patient's age, sex, and ROI dictionaries
-	test = pd.DataFrame(test, index=[0])
-	test.drop('702',axis=1,inplace=True)
-	MUSE_Ref_Values.drop('702',axis=1,inplace=True)
-	test['Age'] = age
-	if sex == "F":
-		test['Sex'] = 0
-	else:
-		test['Sex'] = 1
-
-	# Order test data's columns to those of the reference data
-	MUSE_Ref_Values_tmp = MUSE_Ref_Values.drop('SPARE_BA',axis=1,inplace=False)
-	test = test[MUSE_Ref_Values_tmp.columns]
-
-	### Make numpy arrays of zeros to store results for the classifier ###
-	distances_MUSE_Ref_Values = np.zeros( 1 )
-	predictions_MUSE_Ref_Values = np.zeros( 1 )
-
-	### Drop subjects w/o SPARE-BA
-	MUSE_Ref_Values = MUSE_Ref_Values.dropna(subset=['SPARE_BA'])
-
-	### Get data to be used in classification analysis ###
-	# Training data
-	X_train_MUSE_Ref_Values = MUSE_Ref_Values.loc[:,MUSE_Ref_Values.columns != "SPARE_BA"]
-	Y_train_MUSE_Ref_Values = MUSE_Ref_Values.loc[:,"SPARE_BA"].values
-
-	#Testing data
-	X_test = test.loc[:,test.columns]
-
-	### Actual train + testing ###
-	# scale features
-	scaler_MUSE_Ref_Values = preprocessing.MinMaxScaler( feature_range=(0,1) ).fit( X_train_MUSE_Ref_Values )
-	X_train_MUSE_Ref_Values_norm_sc = scaler_MUSE_Ref_Values.transform( X_train_MUSE_Ref_Values )
-	X_test_MUSE_Ref_Values_norm_sc = scaler_MUSE_Ref_Values.transform( X_test )
-
-	# load classifers
-	svr_MUSE_Ref_Values = svm.SVR( kernel='linear', C=1 );
-
-	# fit classifers
-	svr_MUSE_Ref_Values.fit( X_train_MUSE_Ref_Values_norm_sc, Y_train_MUSE_Ref_Values )
-
-	# Save newly trained svc model
-	#dump(svr_MUSE_Ref_Values, '/data/spareBA.joblib')
-
-	# Load trained reference model
-	#svr_MUSE_Ref_Values = load('/models/spareBA.joblib') 
-
-	# get distance and predictions for the test subject
-	predictions_MUSE_Ref_Values = svr_MUSE_Ref_Values.predict( X_test_MUSE_Ref_Values_norm_sc )
-
-	return predictions_MUSE_Ref_Values
 
 def createSpareBAplot(spareBA, dfSub, dfRef, fig, row, shownCNsubjs, shownADsubjs, shownCNsubjs_WMLS, totCNsubjs, totADsubjs, totCNsubjs_WMLS, fname):
 	allref = dfRef
