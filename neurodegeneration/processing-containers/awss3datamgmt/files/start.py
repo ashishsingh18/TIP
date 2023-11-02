@@ -4,7 +4,6 @@ from os.path import join, exists, dirname, basename
 from glob import glob
 from pathlib import Path
 import shutil
-import SimpleITK as sitk
 import uuid
 import boto3
 from botocore.exceptions import ClientError
@@ -16,22 +15,23 @@ from multiprocessing.pool import ThreadPool
 from subprocess import PIPE, run
 
 ## For local testng
-# os.environ["WORKFLOW_DIR"] = "/sharedFolder/nnu1-230609055148242424" #"<your data directory>"
+# os.environ["WORKFLOW_DIR"] = "/sharedFolder/EOR-230929143859926194" #"<your data directory>"
 # os.environ["BATCH_NAME"] = "batch"
-# os.environ["OPERATOR_IN_DIR"] = "T1_to_nii"
+# os.environ["OPERATOR_IN_DIR"] = "archive"
 # os.environ["OPERATOR_OUT_DIR"] = "output"
 # os.environ["AWS_CREDENTIAL_FILE_PATH"] = "/sharedFolder/credentials"
 # os.environ["AWS_CONFIG_FILE_PATH"] = str(None)
 # os.environ["AWS_ACCESS_KEY"] = str(None)
 # os.environ["AWS_SECRET_KEY"] = str(None)
-# os.environ["S3_BUCKET_NAME"] = "to-kaapana"
-# os.environ['S3_OBJECT_NAME_PREFIX']= 'T1/Subject' #"dag-run-specific"
-# os.environ["S3_ACTION"] = 'get'
-# os.environ["S3_OBJECT_SERIES_UID"] = "2.16.840.1.114362.1.12066432.24920037488.604832115.605.168"
+# os.environ["S3_BUCKET_NAME"] = "data-coming-from-kaapana-develop"
+# os.environ['S3_OBJECT_NAME_PREFIX']= 'S' #"dag-run-specific"
+# os.environ["S3_ACTION"] = 'put'
+# # os.environ["S3_OBJECT_SERIES_UID"] = "2.16.840.1.114362.1.12066432.24920037488.604832115.605.168"
 # os.environ["S3_OBJECT_SERIES_DESCRIPTION"] = "T1"
-# os.environ["S3_OBJECT_GET_EXTENSION"]=".zip" #downloaded from S3 with this extension
-# os.environ["S3_OBJECT_PUT_SUFFIX"]="_0000_0000"
-# os.environ["S3_OBJECT_PUT_EXTENSION"]=".nii.gz" #uploaded to s3 with this extension
+# # os.environ["S3_OBJECT_GET_EXTENSION"]=".zip" #downloaded from S3 with this extension
+# # os.environ["S3_OBJECT_PUT_SUFFIX"]="_0000_0000"
+# # os.environ["S3_OBJECT_PUT_EXTENSION"]=".zip" #uploaded to s3 with this extension
+# os.environ["INPUT_FILE_EXTENSION"]="*.zip"
 
 execution_timeout = 300
 
@@ -50,6 +50,7 @@ series_description = os.environ["S3_OBJECT_SERIES_DESCRIPTION"]
 s3_object_get_extension = os.environ["S3_OBJECT_GET_EXTENSION"]
 s3_object_put_extension = os.environ["S3_OBJECT_PUT_EXTENSION"]
 s3_object_put_suffix = os.environ["S3_OBJECT_PUT_SUFFIX"]#needed for older nnunet version
+input_file_extension = os.environ["INPUT_FILE_EXTENSION"]
 
 # set aws specific env variables if specified by user
 if(aws_access_key != 'None'):
@@ -171,8 +172,10 @@ def upload_file(file_name, bucket, uid,object_name=None):
     print("series uid: ", uid)
     # If S3 object_name was not specified, use file_name
     if object_name == str(None):
-        #object_name = os.path.basename(file_name)
-        object_name = os.path.basename(uid+'.nii.gz')
+        if(input_file_extension == "*.nii.gz"):
+            object_name = os.path.basename(uid+'.nii.gz')
+        else:
+            object_name = os.path.basename(file_name)
         print('object_name: ', object_name)
 
     # Upload the file
@@ -250,7 +253,7 @@ operator_out_dir = operator_out_dir if operator_out_dir.lower() != "none" else N
 assert operator_out_dir is not None
 
 # File-extension to search for in the input-dir
-input_file_extension = "*.nii.gz"
+# input_file_extension = "*.nii.gz"
 
 # How many processes should be started?
 parallel_processes = 1
@@ -299,15 +302,22 @@ for batch_element_dir in batch_folders:
 
     # add a uuid to prefix to generate unique name
     # s3_object_name = s3_object_name_prefix +  uuid.uuid4().hex +  str(processed_count+1) + "_0000_0000.nii.gz"
-    s3_object_name = s3_object_name_prefix +  uuid.uuid4().hex +  str(processed_count+1) + s3_object_put_suffix + s3_object_put_extension
+    if(input_file_extension == "*.nii.gz"):
+        s3_object_name = s3_object_name_prefix +  uuid.uuid4().hex +  str(processed_count+1) + s3_object_put_suffix + s3_object_put_extension
+    else:
+        s3_object_name = "None" #object name same as file name
     print('s3 object name: ', s3_object_name)
     # Single process:
     # Loop for every input-file found with extension 'input_file_extension'
     for input_file in input_files:
 
-        head, tail = os.path.split(input_file)
-        #print('tail: ', tail)
-        uid = os.path.basename(tail).split('.nii.gz', 1)[0]
+        if(input_file_extension == "*.nii.gz"):
+            head, tail = os.path.split(input_file)
+            # print('tail: ', tail)
+            uid = os.path.basename(tail).split('.nii.gz', 1)[0]
+        else:
+            head2, tail2 = os.path.split(batch_element_dir)
+            uid = tail2
         print('uid: ', uid)
         print(f'Applying action "{s3_action}" to files {input_file} in S3 bucket "{s3_bucket_name}"')
         if(s3_action == 'list'):

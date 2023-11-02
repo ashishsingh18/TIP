@@ -1,4 +1,4 @@
-FROM python:3.9-slim
+FROM python:3.10.12-alpine3.18
 
 LABEL IMAGE="AWS-S3-Data-Mgmt"
 LABEL VERSION="0.1.3"
