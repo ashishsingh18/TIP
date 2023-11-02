@@ -29,7 +29,7 @@ def spare_main(dfSub,all_MuseROIs_num,out_path):
 		_os.remove('../tmp/SPARE_BA.csv')
  
 	spare_BA = spare.spare_test(df = df,
-                                mdl_path    = '/refs/kaapana_spareBA.pkl.gz',
+                                mdl_path    = '/refs/kaapana_spareBA_cpu.pkl.gz',
                                 key_var     = 'MRID',
                                 output      = '../tmp/SPARE_BA.csv',
                                 spare_var   = 'SPARE_BA')
