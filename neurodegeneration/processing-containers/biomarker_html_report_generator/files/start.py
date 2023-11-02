@@ -1,18 +1,15 @@
 import sys, os
 import glob
-import json
-import roi_quantifier
-import main as main
-from datetime import datetime
+from main import main as main
 
 # For local testng
-# os.environ["WORKFLOW_DIR"] = "/sharedFolder/M9"
-# os.environ["BATCH_NAME"] = "batch"
-# os.environ["OPERATOR_OUT_DIR"] = "/sharedFolder/M9/output"
-# os.environ["OPERATOR_IN_DCM_METADATA_DIR"] = "GetT1Metadata"
-# os.environ["OPERATOR_IN_DIR_ICV"] = "extract_dlicv_result"
-# os.environ["OPERATOR_IN_DIR_ROI"] = "extract_muse_result"
-# os.environ["OPERATOR_IN_DIR_WMLS"] = 'wmls-output'
+os.environ["WORKFLOW_DIR"] = "/sharedFolder/data/F8_F12_M2_M3_M5/M2"
+os.environ["BATCH_NAME"] = "batch"
+os.environ["OPERATOR_OUT_DIR"] = "/sharedFolder/data/F8_F12_M2_M3_M5/M2/out"
+os.environ["OPERATOR_IN_DCM_METADATA_DIR"] = "GetT1Metadata"
+os.environ["OPERATOR_IN_DIR_ICV"] = "extract_dlicv_result"
+os.environ["OPERATOR_IN_DIR_ROI"] = "extract_muse_lps"
+os.environ["OPERATOR_IN_DIR_WMLS"] = 'wmls-output'
 
 # From the template
 batch_folders = sorted([f for f in glob.glob(os.path.join('/', os.environ['WORKFLOW_DIR'], os.environ['BATCH_NAME'], '*'))])
@@ -62,4 +59,5 @@ for batch_element_dir in batch_folders:
 
         pdf_file_path = os.path.join(element_output_dir, "{}.pdf".format(os.path.basename(batch_element_dir)))
         print("Executing pdf creation")
-        main(roi, icv, wmls, json_file, pdf_file_path) #check this
+        print(pdf_file_path)
+        main(roi, icv, wmls, json_file) #check this
