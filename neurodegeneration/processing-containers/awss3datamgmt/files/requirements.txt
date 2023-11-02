@@ -1,6 +1,4 @@
 boto3
-SimpleITK
 numpy
-pandas==1.2.5
 pathlib
 uuid
