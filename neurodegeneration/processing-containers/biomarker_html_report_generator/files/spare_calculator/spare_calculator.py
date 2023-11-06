@@ -3,6 +3,7 @@ import numpy as np
 import spare_scores as spare
 import pickle
 import os as _os
+import shutil
 
 # Main function that decides order in which functions run in this script
 def spare_main(dfSub,all_MuseROIs_num,out_path):
@@ -14,6 +15,8 @@ def spare_main(dfSub,all_MuseROIs_num,out_path):
 	col_values = [all_MuseROIs_num[i] for i in all_MuseROIs_num if int(i) <= 207]
 	df[col_names] = [col_values]
  
+	### Create a tmp folder to store SPARE AD csv file, delete the old one if exist
+	### Although in our case we don't need the csv file. but it is necessery to have for spare_test method
 	if _os.path.exists('../tmp/SPARE_AD.csv'):
 		_os.remove('../tmp/SPARE_AD.csv')
  
@@ -25,6 +28,9 @@ def spare_main(dfSub,all_MuseROIs_num,out_path):
 	
 	spareAD = spare_AD['data']['SPARE_AD'][0]
  
+ 
+	### Create a tmp folder to store SPARE BA csv file, delete the old one if exist
+	### Although in our case we don't need the csv file. but it is necessery to have for spare_test method
 	if _os.path.exists('../tmp/SPARE_BA.csv'):
 		_os.remove('../tmp/SPARE_BA.csv')
  
@@ -43,5 +49,9 @@ def spare_main(dfSub,all_MuseROIs_num,out_path):
 		pickle.dump(spareAD,pickle_file)
 	with open(_os.path.join(out,UID+'_spareBA.pkl'), 'wb') as pickle_file:
 		pickle.dump(spareBA,pickle_file)
+  
+	#### delete the temporal folder store spare_AD and spare_BA csv files
+	if _os.path.exists('../tmp'):
+		shutil.rmtree('../tmp/')
   
 	return spareAD, spareBA
