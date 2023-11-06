@@ -1,5 +1,6 @@
-import sys, os
+import os
 import glob
+import shutil
 from main import main as main
 
 # For local testng
@@ -19,7 +20,7 @@ for batch_element_dir in batch_folders:
     roi = []
     wmls = []
 
-    print(f'Checking for nrrd/json files')
+    print(f'Checking for nii/json files')
 
     if "None" not in os.environ["OPERATOR_IN_DIR_ICV"]:
         print("icv folder provided")
@@ -57,7 +58,13 @@ for batch_element_dir in batch_folders:
         if not os.path.exists(element_output_dir):
             os.makedirs(element_output_dir)
 
+        ### The output file path: pdf file contains the final report and csv file contains patient information
         pdf_file_path = os.path.join(element_output_dir, "{}.pdf".format(os.path.basename(batch_element_dir)))
-        print("Executing pdf creation")
-        print(pdf_file_path)
-        main(roi, icv, wmls, json_file) #check this
+        csv_path = os.path.join(element_output_dir, "{}_info.csv".format(os.path.basename(batch_element_dir)))
+
+        ### Created the temporal folder to store intermediate results
+        main(roi, icv, wmls, json_file) 
+        
+        ### Move the intermeidate results to the final folder
+        shutil.move('./tmp/tmp.pdf', pdf_file_path)
+        shutil.move('./tmp/tmp_info.csv', csv_path)
