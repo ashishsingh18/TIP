@@ -56,15 +56,6 @@ def main(muse_roi, dlicv_mask,  wmls_mask, dcm_json):
     #      [UID]_WMLSref.pkl - WMLS Reference Information                                                #
     ######################################################################################################
     
-    # dfSub = pd.read_pickle('./tmp/tmp_dfSub.pkl')
-    # dfRef = pd.read_pickle('./tmp/tmp_dfRef.pkl')
-    # WMLSref = pd.read_pickle('./tmp/tmp_WMLSref.pkl')
-    # allz_num = pd.read_pickle('./tmp/tmp_allz_num.pkl')
-    # allz = pd.read_pickle('./tmp/tmp_allz.pkl')
-    # all_MuseROIs_name = pd.read_pickle('./tmp/tmp_all_MuseROIs_name.pkl')
-    # spareAD = pd.read_pickle('./tmp/tmp_spareAD.pkl')
-    # spareBA = pd.read_pickle('./tmp/tmp_spareBA.pkl')
-    
     biomarker_main(dfSub, dfRef, WMLSref, allz_num, allz, all_MuseROIs_name, spareAD, spareBA, './tmp/tmp.pdf')
     
     ############################ Brain Visualize ########################################################
@@ -88,13 +79,3 @@ def main(muse_roi, dlicv_mask,  wmls_mask, dcm_json):
     html_main(pdf_path, dfPat, table, flagtable)
 
     #output is a single html file + all files required by csv_extraction container
-    
-    
-# if __name__ == '__main__':
-
-#     roi = ['/home/diwu/Desktop/F8_F12_M2_M3_M5/M2/batch/2.16.840.1.114362.1.12066432.24920037488.604832288.140.888/extract_muse_lps/2.16.840.1.114362.1.12066432.24920037488.604832288.140.888.nii.gz']
-#     icv = ['/home/diwu/Desktop/F8_F12_M2_M3_M5/M2/batch/2.16.840.1.114362.1.12066432.24920037488.604832288.140.888/extract_dlicv_result/2.16.840.1.114362.1.12066432.24920037488.604832288.140.888.nii.gz']
-#     wmls = ['/home/diwu/Desktop/F8_F12_M2_M3_M5/M2/batch/2.16.840.1.114362.1.12066432.24920037488.604832288.140.888/wmls-output/2.16.840.1.114362.1.12066432.24920037488.604832288.140.888.nii.gz']
-#     _json = '/home/diwu/Desktop/F8_F12_M2_M3_M5/M2/batch/2.16.840.1.114362.1.12066432.24920037488.604832288.140.888/GetT1Metadata/2.16.840.1.114362.1.12066432.24920037488.604832288.140.888.json'
-    
-#     main(roi, icv, wmls, _json)
