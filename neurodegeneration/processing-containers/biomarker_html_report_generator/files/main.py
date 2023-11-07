@@ -9,10 +9,10 @@ from brainvisualize.vtkBrainVisual import _main as brainvisual_main
 from csv_extraction.csv_extraction import _main as csv_main
 from html_generator.html_generator import _main as html_main
 
-def main(muse_roi, dlicv_mask,  wmls_mask, dcm_json):
+def main(muse_roi, dlicv_mask, wmls_mask, dcm_json):
     
     ## Create a tmp directory to store the intermediate results
-    tmp_dir = 'tmp'
+    tmp_dir = 'tmp_folder'
     
     if os.path.exists(tmp_dir):
         shutil.rmtree(tmp_dir)
@@ -30,15 +30,15 @@ def main(muse_roi, dlicv_mask,  wmls_mask, dcm_json):
     #      [UID]_WMLSref.pkl - WMLS Reference Information                                                #
     ######################################################################################################
     
-    dfSub, dfRef, WMLSref, dfPat, allz_num, allz, all_MuseROIs_num, all_MuseROIs_name, MuseROI = roi_quantifier_main(muse_roi, dlicv_mask, wmls_mask, dcm_json, './tmp/tmp.pdf')
-    
+    dfSub, dfRef, WMLSref, dfPat, allz_num, allz, all_MuseROIs_num, all_MuseROIs_name, MuseROI = roi_quantifier_main(muse_roi, dlicv_mask, wmls_mask, dcm_json, './tmp_folder/tmp.pdf')
+    print('ROI QUANTIFIER DONE!')
     ######################## Put all the intermediate output into the tmp folder##########################
     #      [UID]_spareAD.pkl – SPARE AD score (single value)                                             #
     #      [UID]_spareBA.pkl - SPARE BA score (single value)                                             #
     ######################################################################################################
     
-    spareAD, spareBA = spare_main(dfSub, MuseROI, './tmp/tmp.pdf')
-    
+    spareAD, spareBA = spare_main(dfSub, MuseROI, './tmp_folder/tmp.pdf')
+    print('SPARE DONE !')
     ######################## Put all the intermediate output into the out folder##########################
     #      [UID]_flagtable.pkl –  html file contains table information (Brain Volumetry and Comparison   #
     #                                  with Normative Harmonized Population Values)                      #                      
@@ -56,26 +56,28 @@ def main(muse_roi, dlicv_mask,  wmls_mask, dcm_json):
     #      [UID]_WMLSref.pkl - WMLS Reference Information                                                #
     ######################################################################################################
     
-    biomarker_main(dfSub, dfRef, WMLSref, allz_num, allz, all_MuseROIs_name, spareAD, spareBA, './tmp/tmp.pdf')
-    
+    biomarker_main(dfSub, dfRef, WMLSref, allz_num, allz, all_MuseROIs_name, spareAD, spareBA, './tmp_folder/tmp.pdf')
+    print('BOIMARKER DONE !')
     ############################ Brain Visualize ########################################################
     
-    brainvisual_main(muse_roi[0], allz_num, './tmp/tmp.pdf')
-
+    brainvisual_main(muse_roi[0], allz_num, './tmp_folder/tmp.pdf')
+    print('BRAIN DONE !')
 
     ############################ CVS Extraction #########################################################
     
-    csv_main(dfSub, dfRef, WMLSref, allz_num, allz, all_MuseROIs_name, spareAD, spareBA, './tmp/tmp.pdf')
-    
+    csv_main(dfSub, dfRef, WMLSref, allz_num, allz, all_MuseROIs_name, spareAD, spareBA, './tmp_folder/tmp.pdf')
+    print('CSV DONE !')
     ############################ html extraction ########################################################
     
-    dfPat = pd.read_pickle('./tmp/tmp_dfPat.pkl')
-    table = pd.read_pickle('./tmp/tmp_roisubsettable.pkl')
-    flagtable = pd.read_pickle('./tmp/tmp_flagtable.pkl')
+    dfPat = pd.read_pickle('./tmp_folder/tmp_dfPat.pkl')
+    table = pd.read_pickle('./tmp_folder/tmp_roisubsettable.pkl')
+    flagtable = pd.read_pickle('./tmp_folder/tmp_flagtable.pkl')
 
     absolute_path = os.path.abspath(os.getcwd())
 
-    pdf_path = absolute_path + '/tmp/tmp.pdf'
+    pdf_path = absolute_path + '/tmp_folder/tmp.pdf'
     html_main(pdf_path, dfPat, table, flagtable)
+    
+    print('HTML DONE !')
 
     #output is a single html file + all files required by csv_extraction container
