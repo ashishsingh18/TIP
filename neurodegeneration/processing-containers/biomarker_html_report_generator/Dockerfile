@@ -11,7 +11,7 @@ COPY refs /refs
 COPY requirements.txt /src 
 
 RUN apt-get update && \
-    apt-get -y install libcairo2 libpango-1.0-0 libpangocairo-1.0-0 libgdk-pixbuf2.0-0 libffi-dev shared-mime-info libgl1 git && \
+    apt-get -y install libcairo2 libpango-1.0-0 libpangocairo-1.0-0 libgdk-pixbuf2.0-0 libffi-dev shared-mime-info libgl1 git libc6 && \
     cd src && \
     pip install -r requirements.txt && \
     git clone https://github.com/CBICA/spare_score && \
