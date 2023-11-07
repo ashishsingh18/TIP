@@ -485,9 +485,3 @@ def _main( roi, allz_num, pdf_path):
 	out = out + '/' + UID
 	setup_vtk_pipeline(roi,allz_num,out)
 
-# if __name__ == '__main__':
-# 	roi_file = '/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/relabel/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607.nii.gz'
-# 	with open('/home/diwu/Desktop/F2/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607/roi-quantification/2.16.840.1.114362.1.12066432.24920037488.604832326.447.1607_allz_num.pkl','rb') as f:
-# 		allz_num = pickle.load(f)
-# 	pdf_path = './test.pdf'
-# 	_main( roi_file, allz_num, pdf_path)
