@@ -2,6 +2,8 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 from pygam import ExpectileGAM
+import plotly.io as pio
+pio.kaleido.scope.mathjax = None
 
 
 from .boxoffplot import WMHbox
