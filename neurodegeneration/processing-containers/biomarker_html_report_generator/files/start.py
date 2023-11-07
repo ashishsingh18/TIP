@@ -66,5 +66,5 @@ for batch_element_dir in batch_folders:
         main(roi, icv, wmls, json_file) 
         
         ### Move the intermeidate results to the final folder
-        shutil.move('./tmp/tmp.pdf', pdf_file_path)
-        shutil.move('./tmp/tmp_info.csv', csv_path)
+        shutil.move('./tmp_folder/tmp.pdf', pdf_file_path)
+        shutil.move('./tmp_folder/tmp_info.csv', csv_path)
