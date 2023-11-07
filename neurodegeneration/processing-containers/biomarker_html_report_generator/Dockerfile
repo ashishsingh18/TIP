@@ -1,26 +1,23 @@
 FROM --platform=linux/amd64 python:3.9-slim-buster
 
-LABEL IMAGE="BIONORM"
-LABEL VERSION="0.1.0"
+LABEL IMAGE="Result-Generator"
+LABEL VERSION="0.0.1"
 LABEL CI_IGNORE="True"
 
-RUN apt-get update
-RUN apt-get -y install libcairo2 libpango-1.0-0 libpangocairo-1.0-0 libgdk-pixbuf2.0-0 libffi-dev shared-mime-info libgl1
+RUN mkdir /src /logs /refs
+COPY files /src
+COPY logos /logos
+COPY refs /refs
+COPY requirements.txt /src 
 
-COPY requirements.txt ./
-RUN pip install -r requirements.txt
+RUN apt-get update && \
+    apt-get -y install libcairo2 libpango-1.0-0 libpangocairo-1.0-0 libgdk-pixbuf2.0-0 libffi-dev shared-mime-info libgl1 git libc6 && \
+    cd src && \
+    pip install -r requirements.txt && \
+    git clone https://github.com/CBICA/spare_score && \
+    cd spare_score && \
+    pip install .
 
-RUN mkdir /src 
+CMD ["python3","-u","/src/start.py"]
 
-COPY files/normative_biomarker_visualizer.py /src
-COPY files/reportdriver_normative_biomarker_visualizer.py /src
-COPY files/spareAD.py /src
-COPY files/spareBA.py /src
-COPY files/wmls.py /src
-COPY files/createcmap.py /src
-COPY files/boxoffplot.py /src
 
-RUN mkdir /refs
-COPY refs/ /refs
-
-CMD ["python3","-u","src/reportdriver_normative_biomarker_visualizer.py"]

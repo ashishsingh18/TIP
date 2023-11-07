@@ -15,8 +15,6 @@ import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
-import nrrd
-
 from .spareAD import createSpareADplot
 from .spareBA import createSpareBAplot
 
@@ -288,7 +286,7 @@ def plotWithRef(dfRef, WMLSref, dfSub, fname, spareAD, spareBA):
 
 # TODO: 
 def makeFlagTablePKL(dfRef,mydict,MUSErois,path):
-	maphemi = pd.read_csv('../refs/MUSE_ROI_Dictionary.csv')
+	maphemi = pd.read_csv('/refs/MUSE_ROI_Dictionary.csv')
 	all_entries = ""
 
 	# Identify L and R pairs of single ROIs
@@ -395,7 +393,7 @@ def biomarker_main(dfSub, dfRef, WMLSref, allz_num, allz, all_MuseROIs_name, spa
 	out = _os.path.dirname(pdf_path)
 
 	roisubsettable = makeTablePKL(dfRef,dfSub,_os.path.join(out,UID+'_roisubsettable.pkl'))
-	plotWithRef(dfRef,WMLSref, dfSub, _os.path.join(out,UID+'_plot.png'), spareAD[0], spareBA[0])
+	plotWithRef(dfRef,WMLSref, dfSub, _os.path.join(out,UID+'_plot.png'), spareAD, spareBA)
 	flagtable = makeFlagTablePKL(dfRef,allz,all_MuseROIs_name,_os.path.join(out,UID+'_flagtable.pkl'))
  
 	return roisubsettable, flagtable

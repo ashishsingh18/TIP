@@ -33,7 +33,7 @@ def extractTable1(dfRef,dfSub):
 	return dfSub
 
 def extractTable2(dfRef,dfSub,mydict,MUSErois,path):
-	maphemi = pd.read_csv('../refs/MUSE_ROI_Dictionary.csv')
+	maphemi = pd.read_csv('/refs/MUSE_ROI_Dictionary.csv')
 	all_entries = ""
 
 	# Identify L and R pairs of single ROIs

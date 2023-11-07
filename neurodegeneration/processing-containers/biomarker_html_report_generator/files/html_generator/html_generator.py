@@ -140,8 +140,8 @@ def writeHtml(plots, tables, flagtable, dftable, outName, brainplot):#, wmlstabl
 			</div>
 
 			<div class="col-xs-8">
-				<img src="/home/diwu/Desktop/TIP/neurodegeneration/processing-containers/html2pdf/logos/cbica.png" alt='Sorry the image is broken' style='height:40px; width:100px'>
-				<img src="/home/diwu/Desktop/TIP/neurodegeneration/processing-containers/html2pdf/logos/PennMedicineLogo.png" alt='Sorry the image is broken' style='height:30px; width:180px'>
+				<img src="/logos/cbica.png" alt='Sorry the image is broken' style='height:40px; width:100px'>
+				<img src="/logos/PennMedicineLogo.png" alt='Sorry the image is broken' style='height:30px; width:180px'>
 
 			</div>
 			<div class="col-xs-8">\
@@ -202,12 +202,9 @@ def writeHtml(plots, tables, flagtable, dftable, outName, brainplot):#, wmlstabl
     now = datetime.datetime.now(pytz.timezone('US/Eastern'))
     formatted_datetime = 'Report Creation Date (US/Eastern): ' + now.strftime("%m/%d/%Y") + ' Time: ' + now.strftime("%H:%M:%S")
     html_string_test = html_string_test.replace("[datetime]", formatted_datetime)
-    print('hello')
-    print(outName)
     with open(outName, 'w') as f:
         f.write(html_string_test)
    
-    print('here')
 
 
 def _main(pdf_path, dfPat, tables, flagtable):
@@ -217,11 +214,11 @@ def _main(pdf_path, dfPat, tables, flagtable):
     print('os_path', _os.path)
 
     print('Path to Brain Vis')
-    print('../tmp/tmp_finalvis.png')
+    print('../tmp_folder/tmp_finalvis.png')
     
     #brainplot = _os.path.join(in_path_brainvis,UID+'_finalvis.png')
-    brainplot = '../tmp/tmp_finalvis.png'
-    plots = '../tmp/tmp_plot.png'
+    brainplot = '../tmp_folder/tmp_finalvis.png'
+    plots = '../tmp_folder/tmp_plot.png'
 
     html_out = _os.path.join(str(pdf_out),'report.html')
     writeHtml(plots, tables, flagtable, dfPat, html_out, brainplot)
