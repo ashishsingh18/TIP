@@ -17,13 +17,13 @@ def spare_main(dfSub,all_MuseROIs_num,out_path):
  
 	### Create a tmp folder to store SPARE AD csv file, delete the old one if exist
 	### Although in our case we don't need the csv file. but it is necessery to have for spare_test method
-	if _os.path.exists('../tmp/SPARE_AD.csv'):
-		_os.remove('../tmp/SPARE_AD.csv')
+	# if _os.path.exists('../tmp_folder/SPARE_AD.csv'):
+	# 	_os.remove('../tmp_folder/SPARE_AD.csv')
  
 	spare_AD = spare.spare_test(df = df,
                                 mdl_path    = '/refs/kaapana_spareAD.pkl.gz',
                                 key_var     = 'MRID',
-                                output      = '../tmp/SPARE_AD.csv',
+                                output      = '/tmp_folder/SPARE_AD.csv',
                                 spare_var   = 'SPARE_AD')
 	
 	spareAD = spare_AD['data']['SPARE_AD'][0]
@@ -31,13 +31,13 @@ def spare_main(dfSub,all_MuseROIs_num,out_path):
  
 	### Create a tmp folder to store SPARE BA csv file, delete the old one if exist
 	### Although in our case we don't need the csv file. but it is necessery to have for spare_test method
-	if _os.path.exists('../tmp/SPARE_BA.csv'):
-		_os.remove('../tmp/SPARE_BA.csv')
+	#if _os.path.exists('../tmp_folder/SPARE_BA.csv'):
+		#_os.remove('../tmp_folder/SPARE_BA.csv')
  
 	spare_BA = spare.spare_test(df = df,
                                 mdl_path    = '/refs/kaapana_spareBA_cpu.pkl.gz',
                                 key_var     = 'MRID',
-                                output      = '../tmp/SPARE_BA.csv',
+                                output      = '/tmp_folder/SPARE_BA.csv',
                                 spare_var   = 'SPARE_BA')
 	
 	spareBA = spare_BA['data']['SPARE_BA'][0]
@@ -51,7 +51,7 @@ def spare_main(dfSub,all_MuseROIs_num,out_path):
 		pickle.dump(spareBA,pickle_file)
   
 	#### delete the temporal folder store spare_AD and spare_BA csv files
-	if _os.path.exists('../tmp'):
-		shutil.rmtree('../tmp/')
+	# if _os.path.exists('../tmp'):
+	# 	shutil.rmtree('../tmp/')
   
 	return spareAD, spareBA
