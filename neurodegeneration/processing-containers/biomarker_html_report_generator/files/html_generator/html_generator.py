@@ -214,11 +214,11 @@ def _main(pdf_path, dfPat, tables, flagtable):
     print('os_path', _os.path)
 
     print('Path to Brain Vis')
-    print('../tmp_folder/tmp_finalvis.png')
+    print('/tmp_folder/tmp_finalvis.png')
     
     #brainplot = _os.path.join(in_path_brainvis,UID+'_finalvis.png')
-    brainplot = '../tmp_folder/tmp_finalvis.png'
-    plots = '../tmp_folder/tmp_plot.png'
+    brainplot = '/tmp_folder/tmp_finalvis.png'
+    plots = '/tmp_folder/tmp_plot.png'
 
     html_out = _os.path.join(str(pdf_out),'report.html')
     writeHtml(plots, tables, flagtable, dfPat, html_out, brainplot)
