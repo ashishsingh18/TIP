@@ -4,9 +4,9 @@ import shutil
 from main import main as main
 
 # For local testng
-# os.environ["WORKFLOW_DIR"] = "/sharedFolder/data/M2"
+# os.environ["WORKFLOW_DIR"] = "/sharedFolder/data/F8_F12_M2_M3_M5/F12"
 # os.environ["BATCH_NAME"] = "batch"
-# os.environ["OPERATOR_OUT_DIR"] = "/sharedFolder/data/M2/out"
+# os.environ["OPERATOR_OUT_DIR"] = "/sharedFolder/data/F8_F12_M2_M3_M5/F12/out"
 # os.environ["OPERATOR_IN_DCM_METADATA_DIR"] = "GetT1Metadata"
 # os.environ["OPERATOR_IN_DIR_ICV"] = "extract_dlicv_result"
 # os.environ["OPERATOR_IN_DIR_ROI"] = "extract_muse_lps"
