@@ -142,6 +142,9 @@ def calcRoiVolumes(maskfile, mapcsv, dfRef, subDict):
                                                                                                                                            (dfRefTmp['Diagnosis_nearest_2.0'] == 'CN')]['ICV'].mean()), axis = 1) ## CN Only
 	# Convert from mm^3 to cm^3
 	dfRefTmp[dfRefTmp.columns.difference(nonROI)] = dfRefTmp[dfRefTmp.columns.difference(nonROI)]/1000
+ 
+	age = float(subDict['Age'])
+	dfRefTmp = dfRefTmp[(dfRefTmp['Age'] >= age -3 ) & (dfRefTmp['Age'] <= age + 3) & (dfRefTmp['Diagnosis_nearest_2.0'] == 'CN')]
 
 	## Create anatomical structure to z-score equivalency for the subject; only considering ROIs Ilya said to use! - z-score is calculated across all same sex ref patients
 	for i in list(all_MuseROIs.keys()):
