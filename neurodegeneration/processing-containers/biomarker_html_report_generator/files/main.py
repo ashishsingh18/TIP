@@ -67,7 +67,7 @@ def main(muse_roi, dlicv_mask, wmls_mask, dcm_json):
     ############################ Brain Visualize ########################################################
     
     #brainvisual_main(muse_roi[0], allz_num, tmp_file_path)
-    brainvisual_main('/refs/20181205_124179_T1_LPS_muse_relabeled.nii.gz', allz_num, tmp_file_path)
+    brainvisual_main('../refs/20181205_124179_T1_LPS_muse_relabeled.nii.gz', allz_num, tmp_file_path)
 
     print('BRAIN DONE !')
 
