@@ -77,7 +77,7 @@ def calcMaskVolume(maskfile):
 	return maskVol
 
 ### Function to calculate derived ROI volumes for MUSE
-def calcRoiVolumes(maskfile, mapcsv, dfRef, subDict):
+def calcRoiVolumes(maskfile, mapcsv, dfRef, subDict, icvVol):
 	
 	### Check input mask
 	if not maskfile:
@@ -147,10 +147,16 @@ def calcRoiVolumes(maskfile, mapcsv, dfRef, subDict):
 	dfRefTmp = dfRefTmp[(dfRefTmp['Age'] >= age -3 ) & (dfRefTmp['Age'] <= age + 3) & (dfRefTmp['Diagnosis_nearest_2.0'] == 'CN')]
 
 	## Create anatomical structure to z-score equivalency for the subject; only considering ROIs Ilya said to use! - z-score is calculated across all same sex ref patients
+
 	for i in list(all_MuseROIs.keys()):
 		# Only look at single ROIs
 		if int(i) <= 207:
-			allz[i] = ((all_MuseROIs[i]/1000) - dfRefTmp[i].mean())/(dfRefTmp[i].std())
+			#### correction first 
+			correction = (all_MuseROIs[i] / icvVol) * dfRefTmp['ICV'].mean() / 1000
+			#### standard deviation second
+			allz[i] = (correction - dfRefTmp[i].mean())/(dfRefTmp[i].std())
+			
+			#allz[i] = ((all_MuseROIs[i]/1000) - dfRefTmp[i].mean())/(dfRefTmp[i].std())
 			allz_num[i] = allz[i]
 			name = list(maphemi.loc[(maphemi['ROI_INDEX'] == int(i)), 'ROI_NAME'].values)[0]
 			allz[name] = allz.pop(i)
@@ -279,6 +285,17 @@ def calcRoiVolumes(maskfile, mapcsv, dfRef, subDict):
 
 ### Function adjust all ROIs by ICV and scales down by 1000 ###
 def ICVAdjust(dfSub, dfRef,WMLSref,all_MuseROIs_num,all_MuseROIs_name):
+    
+    ## ICV-adjustment for ROI reference values
+	nonROI = list(dfRef.columns[dfRef.columns.str.contains('AI')].values)
+	othervars = ['MRID','Study','PTID','Age','Sex','Diagnosis_nearest_2.0','SITE','Date','ICV','SPARE_AD','SPARE_BA']
+	nonROI.extend(othervars)
+ 
+	dfRef[dfRef.columns.difference(nonROI)] = dfRef.apply(lambda row: row[dfRef.columns.difference(nonROI)].div(row['ICV']).mul(dfRef[ (dfRef['Age'] >= row['Age'] -3 ) & ## Ref age >= age - 3
+                                                                                                                                       (dfRef['Age'] <= row['Age'] +3 ) & ## Ref age <= age + 3
+                                                                                                                                       (dfRef['Diagnosis_nearest_2.0'] == 'CN')]['ICV'].mean()), axis = 1) ## CN Only
+	dfRef[dfRef.columns.difference(nonROI)] = dfRef[dfRef.columns.difference(nonROI)]/1000
+	
 
 	## ICV-adjustment for subject values
 	nonROI = list(dfSub.columns[dfSub.columns.str.contains('AI')].values)
@@ -298,18 +315,6 @@ def ICVAdjust(dfSub, dfRef,WMLSref,all_MuseROIs_num,all_MuseROIs_name):
     # make 702 into actual ICV value
 	all_MuseROIs_num['702'] = dfSub['ICV'].values[0]
  
-     
-    ## ICV-adjustment for ROI reference values
-	nonROI = list(dfRef.columns[dfRef.columns.str.contains('AI')].values)
-	othervars = ['MRID','Study','PTID','Age','Sex','Diagnosis_nearest_2.0','SITE','Date','ICV','SPARE_AD','SPARE_BA']
-	nonROI.extend(othervars)
- 
-	dfRef[dfRef.columns.difference(nonROI)] = dfRef.apply(lambda row: row[dfRef.columns.difference(nonROI)].div(row['ICV']).mul(dfRef[ (dfRef['Age'] >= row['Age'] -3 ) & ## Ref age >= age - 3
-                                                                                                                                       (dfRef['Age'] <= row['Age'] +3 ) & ## Ref age <= age + 3
-                                                                                                                                       (dfRef['Diagnosis_nearest_2.0'] == 'CN')]['ICV'].mean()), axis = 1) ## CN Only
-	dfRef[dfRef.columns.difference(nonROI)] = dfRef[dfRef.columns.difference(nonROI)]/1000
-	
-
 
 	## ICV-adjustment for WMLS reference values
 	nonROI = ['ID','Phase','PTID','Age','Sex','Diagnosis_nearest_2.0','Date','ICV']
@@ -367,7 +372,7 @@ def roi_quantifier_main(roi, icv, wmls, _json, out_path):
 		dfSub['ICV'] = icvVol
 
 	# Obtain foundational objects for after this container
-	roiVols, dfRef, allz, allz_num, all_MuseROIs_num, all_MuseROIs_name = calcRoiVolumes(roi[0], MUSE_ROI_Mapping, dfRef, subDict)
+	roiVols, dfRef, allz, allz_num, all_MuseROIs_num, all_MuseROIs_name = calcRoiVolumes(roi[0], MUSE_ROI_Mapping, dfRef, subDict, icvVol)
  
 	# Add subject MUSE volumes to 
 	for key in roiVols.keys():
