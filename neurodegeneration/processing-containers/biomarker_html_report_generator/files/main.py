@@ -82,12 +82,9 @@ def main(muse_roi, dlicv_mask, wmls_mask, dcm_json):
     table = pd.read_pickle(tmp_dir + '/tmp_roisubsettable.pkl')
     flagtable = pd.read_pickle(tmp_dir + '/tmp_flagtable.pkl')
 
-    #absolute_path = os.path.abspath(os.getcwd())
 
     #pdf_path = absolute_path + tmp_file_path
     #print('pdf_path : ', pdf_path)
     html_main(tmp_file_path, dfPat, table, flagtable)
     
     print('HTML DONE !')
-
-    #output is a single html file + all files required by csv_extraction container
