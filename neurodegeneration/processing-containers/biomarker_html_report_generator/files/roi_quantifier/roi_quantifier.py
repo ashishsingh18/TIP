@@ -227,20 +227,14 @@ def calcRoiVolumes(maskfile, mapcsv, dfRef, subDict, icvVol):
 	# Total gray matter
 	dictr["Total Gray Matter Volume"] = all_MuseROIs["601"]
 	dfRef["601"] = dfRef["601"]
-	#dfRef.rename(columns={"601":"Total Gray Matter Volume"}, inplace = True)
 	dfRef['Total Gray Matter Volume'] = dfRef['601']
  
 	# Right gray matter - had to adjust this ROI with 1/2 of certain ROIs
 	dictr["Right Gray Matter Volume"] = all_MuseROIs["613"] + all_MuseROIs["71"]/2 + all_MuseROIs["72"]/2 + all_MuseROIs["73"]/2
-	# dfRef["613"] = dfRef["613"] + dfRef["71"]/2 + dfRef["72"]/2 + dfRef["73"]/2
-	# dfRef.rename(columns={"613":"Right Gray Matter Volume"}, inplace = True)
- 
 	dfRef["Right Gray Matter Volume"] = dfRef["613"] + dfRef["71"]/2 + dfRef["72"]/2 + dfRef["73"]/2
  
 	# Left gray matter - had to adjust this ROI with 1/2 of certain ROIs
 	dictr["Left Gray Matter Volume"] = all_MuseROIs["606"] + all_MuseROIs["71"]/2 + all_MuseROIs["72"]/2 + all_MuseROIs["73"]/2
-	# dfRef["606"] = dfRef["606"] + dfRef["71"]/2 + dfRef["72"]/2 + dfRef["73"]/2
-	# dfRef.rename(columns={"606":"Left Gray Matter Volume"}, inplace = True)
 	dfRef['Left Gray Matter Volume'] =  dfRef["606"] + dfRef["71"]/2 + dfRef["72"]/2 + dfRef["73"]/2
 
 	# Asymmetry index for gray matter
@@ -250,17 +244,14 @@ def calcRoiVolumes(maskfile, mapcsv, dfRef, subDict, icvVol):
 	### White Matter ###
 	# Total white matter
 	dictr["Total White Matter Volume"] = all_MuseROIs["604"]
-	#dfRef.rename(columns={"604":"Total White Matter Volume"}, inplace = True)
 	dfRef['Total White Matter Volume'] = dfRef['604']
 
 	# Right white matter - had to adjust this ROI with 1/2 of certain ROIs
 	dictr["Right White Matter Volume"] = all_MuseROIs["614"] + all_MuseROIs["95"]/2
-	#dfRef.rename(columns={"614":"Right White Matter Volume"}, inplace = True)
 	dfRef['Right White Matter Volume'] = dfRef['614']
  
 	# Left white matter - had to adjust this ROI with 1/2 of certain ROIs
 	dictr["Left White Matter Volume"] = all_MuseROIs["607"] + all_MuseROIs["95"]/2
-	#dfRef.rename(columns={"607":"Left White Matter Volume"}, inplace = True)
 	dfRef['Left White Matter Volume'] = dfRef['607']
  
 	# Asymmetry index for white matter
@@ -291,6 +282,7 @@ def ICVAdjust(dfSub, dfRef,WMLSref,all_MuseROIs_num,all_MuseROIs_name):
 	othervars = ['MRID','Study','PTID','Age','Sex','Diagnosis_nearest_2.0','SITE','Date','ICV','SPARE_AD','SPARE_BA']
 	nonROI.extend(othervars)
  
+	### Reference data corrected 
 	dfRef[dfRef.columns.difference(nonROI)] = dfRef.apply(lambda row: row[dfRef.columns.difference(nonROI)].div(row['ICV']).mul(dfRef[ (dfRef['Age'] >= row['Age'] -3 ) & ## Ref age >= age - 3
                                                                                                                                        (dfRef['Age'] <= row['Age'] +3 ) & ## Ref age <= age + 3
                                                                                                                                        (dfRef['Diagnosis_nearest_2.0'] == 'CN')]['ICV'].mean()), axis = 1) ## CN Only
