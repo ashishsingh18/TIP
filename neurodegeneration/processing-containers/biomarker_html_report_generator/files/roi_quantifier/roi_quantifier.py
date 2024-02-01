@@ -184,8 +184,6 @@ def calcRoiVolumes(maskfile, mapcsv, dfRef, subDict, icvVol):
 
 	### Brainstem ### - had to adjust this ROI
 	dictr["Total Brainstem Volume"] = all_MuseROIs["35"] + all_MuseROIs["61"] + all_MuseROIs["62"]
-	# dfRef["35"] = dfRef["35"] + dfRef["61"] + dfRef["62"]
-	# dfRef.rename(columns={"35":"Total Brainstem Volume"}, inplace = True)
 	dfRef['Total Brainstem Volume'] = dfRef["35"] + dfRef["61"] + dfRef["62"]
 
 	### Ventricles###
