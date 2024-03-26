@@ -15,17 +15,15 @@ from multiprocessing.pool import ThreadPool
 from subprocess import PIPE, run
 
 ## For local testng
-os.environ["WORKFLOW_DIR"] = "/sharedFolder/F12" #"<your data directory>"
-os.environ["BATCH_NAME"] = "batch"
-os.environ["OPERATOR_IN_DIR"] = "T1"
-os.environ["OPERATOR_OUT_DIR"] = "output"
-os.environ["NII_SEGMENTATION"] = "extract_dlicv_result" #"wmls-output"
-# os.environ["SEG_INFO_JSON"] = "/sharedFolder/0.1.0/files/seg_info.json"
-# os.environ["SR_INFO_JSON"] = "/sharedFolder/0.1.0/files/sr_template.json"
-os.environ["SERIES_DESCRIPTION"] = "Neuro AD Measurements"
-os.environ["INFO_CSV_DIR"] = "result-generator" 
-os.environ["SERIES_NUMBER"] = "905" 
-os.environ["INSTANCE_NUMBER"] = "1"
+# os.environ["WORKFLOW_DIR"] = "/sharedFolder/F12" #"<your data directory>"
+# os.environ["BATCH_NAME"] = "batch"
+# os.environ["OPERATOR_IN_DIR"] = "T1"
+# os.environ["OPERATOR_OUT_DIR"] = "output"
+# os.environ["NII_SEGMENTATION"] = "extract_dlicv_result" #"wmls-output"
+# os.environ["SERIES_DESCRIPTION"] = "Neuro AD Measurements"
+# os.environ["INFO_CSV_DIR"] = "result-generator" 
+# os.environ["SERIES_NUMBER"] = "905" 
+# os.environ["INSTANCE_NUMBER"] = "1"
 
 #windows
 # os.environ["WORKFLOW_DIR"] = "D:\\ashish\\work\\projects\\KaapanaStuff\\dockerContainers\\NeuroSRGenerator\\F12" #"<your data directory>"
@@ -45,17 +43,12 @@ execution_timeout = 300
 processed_count = 0
 
 nii_seg = os.environ["NII_SEGMENTATION"]
-# seg_info_json = os.environ['SEG_INFO_JSON']
-# sr_info_json = os.environ['SR_INFO_JSON']
 csv_info_dir = os.environ["INFO_CSV_DIR"]
 series_num = os.environ["SERIES_NUMBER"]
 instance_num = os.environ["INSTANCE_NUMBER"]
-seg_info_json = 'seg_info.json'
-sr_info_json = 'sr_template.json'
+seg_info_json = '/kaapana/app/seg_info.json'
+sr_info_json = '/kaapana/app/sr_template.json'
 series_desc = os.environ["SERIES_DESCRIPTION"]
-
-if not os.path.exists('/tempIn'):
-   os.makedirs('/tempIn')
 
 if not os.path.exists('/tempOut'):
    os.makedirs('/tempOut')
@@ -312,19 +305,21 @@ for batch_element_dir in batch_folders:
 
     #create dicom seg object
     out_dcm_seg_file = join(element_output_dir,"dicomsegT1.dcm")
+    #out_dcm_seg_file = join("/tempOut","dicomsegT1.dcm")
     print("out_dcm_seg_file: ", out_dcm_seg_file)
     create_dicom_seg(element_input_dir,nii_seg_file,out_dcm_seg_file,seg_info_json)
 
     #create SR info dict
-    update_json_for_subject(sr_info_json,element_input_dir,sr_data_dict,out_dcm_seg_file,"subject_sr_info.json")
+    subject_sr_file = "/kaapana/app/subject_sr_info.json"
+    update_json_for_subject(sr_info_json,element_input_dir,sr_data_dict,out_dcm_seg_file,subject_sr_file)
     # create_subject_sr_metajson(sr_info_json,element_input_dir,sr_data_dict,out_dcm_seg_file,"subject_sr_info.json")
     # exit()
     #create dicom sr object
     out_dcm_sr_file = join(element_output_dir,"dicomsrT1.dcm")
     print("out_dcm_sr_file: ", out_dcm_sr_file)
     print('sr_info_json: ', sr_info_json)
-    create_dicom_sr(element_input_dir,element_output_dir,out_dcm_sr_file,"subject_sr_info.json")
-    #create_dicom_sr(element_input_dir,element_output_dir,out_dcm_sr_file,sr_info_json)
+    create_dicom_sr(element_input_dir,element_output_dir,out_dcm_sr_file,subject_sr_file)
+    #create_dicom_sr(element_input_dir,out_dcm_seg_file,out_dcm_sr_file,"subject_sr_info.json")
     processed_count += 1
 
 print("#")
