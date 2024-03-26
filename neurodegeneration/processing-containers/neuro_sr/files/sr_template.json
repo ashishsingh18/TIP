@@ -1,0 +1,135 @@
+
+{
+"@schema" : "https://raw.githubusercontent.com/qiicr/dcmqi/master/doc/schemas/pm-schema.json#",
+
+"SeriesDescription": "<SERIES_DESCRIPTION>",
+"SeriesNumber": "<SERIES_NUM>",
+"InstanceNumber": "<INSTANCE_NUM>",
+
+"compositeContext": [
+  "<DCM_SEGMENTATION_FILE>"
+],
+
+"imageLibrary": [
+	"<INSTANCE_FILE_LIST>"
+],
+
+"observerContext": {
+  "ObserverType": "DEVICE",
+  "DeviceObserverName": "AI Segmentation",
+  "DeviceObserverManufacturer": "Penn",
+  "DeviceObserverUID": "1.2.3.4"
+},
+
+"VerificationFlag": "UNVERIFIED",
+"CompletionFlag": "COMPLETE",
+
+"activitySession": "1",
+"timePoint": "1",
+
+"Measurements": [
+  {
+    "TrackingIdentifier": "AD measurements",
+    "ReferencedSegment": 1,
+    "SourceSeriesForImageSegmentation": "<SERIES_UID>",
+    "segmentationSOPInstanceUID": "<SEGMENTATION_UID>",
+    "Finding": {
+      "CodeValue": "12738006",
+      "CodingSchemeDesignator": "SCT",
+      "CodeMeaning": "Brain"
+    },
+    "FindingSite": {
+      "CodeValue": "12738006",
+      "CodingSchemeDesignator": "SCT",
+      "CodeMeaning": "Brain"
+    },
+    "measurementAlgorithmIdentification": {
+      "AlgorithmName": "Neuro AD Pipeline",
+      "AlgorithmVersion": "1.0",
+      "AlgorithmParameters": ["AD-Pipeline"]
+    },
+    "measurementItems": [
+      {
+        "value": "<LEFT_HIPPOCAMPUS_VOLUME>",
+        "quantity": {
+          "CodeValue": "118565006",
+          "CodingSchemeDesignator": "SCT",
+          "CodeMeaning": "Left Hippocampus Volume"
+        },
+        "units": {
+          "CodeValue": "mm3",
+          "CodingSchemeDesignator": "SCT",
+          "CodeMeaning": "cubic millimeterr"
+        }
+      },
+	  {
+        "value": "<RIGHT_HIPPOCAMPUS_VOLUME>",
+        "quantity": {
+          "CodeValue": "118565006",
+          "CodingSchemeDesignator": "SCT",
+          "CodeMeaning": "Right Hippocampus Volume"
+        },
+        "units": {
+          "CodeValue": "mm3",
+          "CodingSchemeDesignator": "SCT",
+          "CodeMeaning": "cubic millimeter"
+        }
+      },
+	  {
+        "value": "<TOTAL_BRAIN_VOLUME>",
+        "quantity": {
+          "CodeValue": "118565006",
+          "CodingSchemeDesignator": "SCT",
+          "CodeMeaning": "Total Brain Volume"
+        },
+        "units": {
+          "CodeValue": "mm3",
+          "CodingSchemeDesignator": "SCT",
+          "CodeMeaning": "cubic millimeter"
+        }
+      },
+	  {
+        "value": "<TOTAL_WMH_VOLUME>",
+        "quantity": {
+          "CodeValue": "118565006",
+          "CodingSchemeDesignator": "SCT",
+          "CodeMeaning": "Total White Matter Hyperintensity Volume"
+        },
+        "units": {
+          "CodeValue": "mm3",
+          "CodingSchemeDesignator": "SCT",
+          "CodeMeaning": "cubic millimeter"
+        }
+      },
+	  {
+        "value": "<SPARE_AD>",
+        "quantity": {
+          "CodeValue": "702873001",
+          "CodingSchemeDesignator": "SCT",
+          "CodeMeaning": "SPARE-AD"
+        },
+        "units": {
+          "CodeValue": "-",
+          "CodingSchemeDesignator": "SCT",
+          "CodeMeaning": "-"
+        }
+      },
+	  {
+        "value": "<SPARE_BA>",
+        "quantity": {
+          "CodeValue": "702873001",
+          "CodingSchemeDesignator": "SCT",
+          "CodeMeaning": " SPARE-BA"
+        },
+        "units": {
+          "CodeValue": "-",
+          "CodingSchemeDesignator": "SCT",
+          "CodeMeaning": "-"
+        }
+      }
+    ]
+  }
+
+]
+
+}

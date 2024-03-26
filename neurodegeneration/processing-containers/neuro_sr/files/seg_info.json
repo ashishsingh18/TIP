@@ -1,0 +1,37 @@
+{
+    "@schema": "https://raw.githubusercontent.com/qiicr/dcmqi/master/doc/schemas/seg-schema.json#",
+    "ContentCreatorName": "kaapana",
+    "InstanceNumber": "1",
+    "SeriesDescription": "ICV_SEGMENTATION",
+    "SeriesNumber": "301",
+    "segmentAttributes": [
+        [
+            {
+                "SegmentAlgorithmName": "DLICV",
+                "SegmentAlgorithmType": "AUTOMATIC",
+                "SegmentLabel": "Brain",
+                "SegmentedPropertyCategoryCodeSequence": {
+                    "CodeMeaning": "Brain",
+                    "CodeValue": "12738006 ",
+                    "CodingSchemeDesignator": "SCT"
+                },
+                "SegmentedPropertyTypeCodeSequence": {
+                    "CodeMeaning": "Brain",
+                    "CodeValue": "12738006 ",
+                    "CodingSchemeDesignator": "SCT"
+                },
+                "SegmentedPropertyTypeModifierCodeSequence": {
+                    "CodeMeaning": "Brain",
+                    "CodeValue": "12738006 ",
+                    "CodingSchemeDesignator": "SCT"
+                },
+                "labelID": 1,
+                "recommendedDisplayRGBValue": [
+                    0,
+                    0,
+                    128
+                ]
+            }
+        ]
+    ]
+}
