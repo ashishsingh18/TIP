@@ -110,10 +110,11 @@ def get_sr_values_from_csv(csv_path):
         sr_keys = ['SPARE_AD','SPARE_BA',
         'Total White Matter Hyperintensity Volume',
         'Left Hippocampus Volume','Right Hippocampus Volume',
-        'Total Brain Volume']
+        'Total Brain Volume','Total Ventricle Volume','ICV','Age']
         sr_data_dict = {}
         for i in  sr_keys:
-            sr_data_dict[i] = '{:.2f}'.format(float(data[i]))
+            # sr_data_dict[i] = '{:.2f}'.format(float(data[i]))
+            sr_data_dict[i] = float(data[i])
         data.clear()
         return sr_data_dict
 
@@ -186,6 +187,20 @@ def update_json_for_subject(json_file_template, dicom_dir, sr_data_dict, dcm_seg
     sopintanceUID = seg_img.GetMetaData("0008|0018")
     print("seriesUID: ", str(seriesinstanceUID))
     print("sopUID: ", str(sopintanceUID))
+    icv_val_cm3 = float(sr_data_dict["ICV"])/1000.0
+    chrono_age_val = float(sr_data_dict["Age"])
+
+    lhv_icv_perct = (float(sr_data_dict["Left Hippocampus Volume"])/icv_val_cm3)*100.0
+    rhv_icv_perct = (float(sr_data_dict["Right Hippocampus Volume"])/icv_val_cm3)*100.0
+    tbv_icv_perct = (float(sr_data_dict["Total Brain Volume"])/icv_val_cm3)*100.0
+    tvv_icv_perct = (float(sr_data_dict["Total Ventricle Volume"])/icv_val_cm3)*100.0
+    brain_age_gap = sr_data_dict["SPARE_BA"] - chrono_age_val
+    print('lhv_icv_perct: ', '{:.2f}'.format(float(lhv_icv_perct)))
+    print('rhv_icv_perct: ', '{:.2f}'.format(float(rhv_icv_perct)))
+    print('tbv_icv_perct: ', '{:.2f}'.format(float(tbv_icv_perct)))
+    print('tvv_icv_perct: ', '{:.2f}'.format(float(tvv_icv_perct)))
+    print('brain age gap: ', brain_age_gap)
+    print('spare AD: ', '{:.2f}'.format((sr_data_dict["SPARE_AD"])))
 
     dcm_seg_basename = os.path.basename(dcm_seg_file)
     data["compositeContext"] = [dcm_seg_basename]
@@ -196,17 +211,19 @@ def update_json_for_subject(json_file_template, dicom_dir, sr_data_dict, dcm_seg
     data["Measurements"][0]["segmentationSOPInstanceUID"] = sopintanceUID
     for item in data["Measurements"][0]["measurementItems"]:
         if(item["value"] == "<LEFT_HIPPOCAMPUS_VOLUME>"):
-            item["value"] = sr_data_dict["Left Hippocampus Volume"]
+            item["value"] = '{:.1f}'.format(float(lhv_icv_perct))
         elif(item["value"] == "<RIGHT_HIPPOCAMPUS_VOLUME>"):
-            item["value"] = sr_data_dict["Right Hippocampus Volume"]
+            item["value"] = '{:.1f}'.format(float(rhv_icv_perct))
         elif(item["value"] == "<TOTAL_BRAIN_VOLUME>"):
-            item["value"] = sr_data_dict["Total Brain Volume"]
+            item["value"] = str(int(tbv_icv_perct))
+        elif(item["value"] == "<TOTAL_VENTRICLE_VOLUME>"):
+            item["value"] = str(int(tvv_icv_perct))
         elif(item["value"] == "<TOTAL_WMH_VOLUME>"):
-            item["value"] = sr_data_dict["Total White Matter Hyperintensity Volume"]
+            item["value"] = '{:.1f}'.format((sr_data_dict["Total White Matter Hyperintensity Volume"]))
         elif(item["value"] == "<SPARE_AD>"):
-            item["value"] = sr_data_dict["SPARE_AD"]
+            item["value"] = '{:.1f}'.format((sr_data_dict["SPARE_AD"]))
         elif(item["value"] == "<SPARE_BA>"):
-            item["value"] = sr_data_dict["SPARE_BA"]
+            item["value"] = '{:.1f}'.format((brain_age_gap))
     
     # Write the updated data back to the JSON file
     with open(sub_json_file_out, 'w') as json_file2:

@@ -52,42 +52,55 @@
       {
         "value": "<LEFT_HIPPOCAMPUS_VOLUME>",
         "quantity": {
-          "CodeValue": "118565006",
+          "CodeValue": "118582008",
           "CodingSchemeDesignator": "SCT",
-          "CodeMeaning": "Left Hippocampus Volume"
+          "CodeMeaning": "Left Hippocampus Volume (%ICV)"
         },
         "units": {
-          "CodeValue": "mm3",
+          "CodeValue": "%",
           "CodingSchemeDesignator": "SCT",
-          "CodeMeaning": "cubic millimeterr"
+          "CodeMeaning": "Percent"
         }
       },
 	  {
         "value": "<RIGHT_HIPPOCAMPUS_VOLUME>",
         "quantity": {
-          "CodeValue": "118565006",
+          "CodeValue": "118582008",
           "CodingSchemeDesignator": "SCT",
-          "CodeMeaning": "Right Hippocampus Volume"
+          "CodeMeaning": "Right Hippocampus Volume (%ICV)"
         },
         "units": {
-          "CodeValue": "mm3",
+          "CodeValue": "%",
           "CodingSchemeDesignator": "SCT",
-          "CodeMeaning": "cubic millimeter"
+          "CodeMeaning": "Percent"
         }
       },
 	  {
         "value": "<TOTAL_BRAIN_VOLUME>",
         "quantity": {
-          "CodeValue": "118565006",
+          "CodeValue": "118582008",
           "CodingSchemeDesignator": "SCT",
-          "CodeMeaning": "Total Brain Volume"
+          "CodeMeaning": "Total Brain Volume (%ICV)"
         },
         "units": {
-          "CodeValue": "mm3",
+          "CodeValue": "%",
           "CodingSchemeDesignator": "SCT",
-          "CodeMeaning": "cubic millimeter"
+          "CodeMeaning": "Percent"
         }
       },
+    {
+      "value": "<TOTAL_VENTRICLE_VOLUME>",
+      "quantity": {
+        "CodeValue": "118582008",
+        "CodingSchemeDesignator": "SCT",
+        "CodeMeaning": "Total Ventricle Volume (%ICV)"
+      },
+      "units": {
+        "CodeValue": "%",
+        "CodingSchemeDesignator": "SCT",
+        "CodeMeaning": "Percent"
+      }
+    },      
 	  {
         "value": "<TOTAL_WMH_VOLUME>",
         "quantity": {
@@ -96,9 +109,9 @@
           "CodeMeaning": "Total White Matter Hyperintensity Volume"
         },
         "units": {
-          "CodeValue": "mm3",
+          "CodeValue": "cm3",
           "CodingSchemeDesignator": "SCT",
-          "CodeMeaning": "cubic millimeter"
+          "CodeMeaning": "cubic centimeter"
         }
       },
 	  {
@@ -119,7 +132,7 @@
         "quantity": {
           "CodeValue": "702873001",
           "CodingSchemeDesignator": "SCT",
-          "CodeMeaning": " SPARE-BA"
+          "CodeMeaning": " Brain Age Gap (SPARE BA - Chronological Age)"
         },
         "units": {
           "CodeValue": "-",
